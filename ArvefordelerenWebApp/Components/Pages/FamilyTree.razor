@@ -1,14 +1,17 @@
 @page "/FamilyTree"
 
+<link rel="stylesheet" href="NavMenu.css" />
 <PageTitle>Stamtræ</PageTitle>
 
 
 
 <div class="nav">
-    <NavLink>
-        <li>Export</li>
-        <li>Upload</li>
-        <a>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consectetur, ipsum dolore dolorum nemo laborum quisquam, totam modi voluptates fuga delectus laboriosam dolores facilis voluptatem est? Molestias atque quaerat nisi quos!  </a>
+    <NavLink class="nav-menu">
+        <li><button>Home</button></li>
+        <a></a>
+        <li><button>Export</button></li>
+        <a></a>
+        <li><button>Upload</button></li>
     </NavLink>
 </div>
 
@@ -16,6 +19,7 @@
 <section class="familyTreeContainer" id="optionsContainer">
 
     <article class="familyTreeOptions">
+  <input type="text" id="tilføj" name="tilføj"> <input type="button">
         <a>Tilføj person til stamtræ</a>
     </article>
 
@@ -23,7 +27,20 @@
         <a>Slet person fra stamtræ</a>
     </article>
 
-</section class="familyTreeContainer" id="familyTreeContainer">
+    <article class="familyTreeOptions">
+        <a>Se din arv</a>
+    </article>
+
+</section>
+
+<section class="familyTreeContainer" id="familyTree">
+    <table id="tableFamilyTree">
+        <tr class="tableRow">
+            <th> Navn </th>
+            <th> Arveklasse </th>
+        </tr>
+    </table>
+</section>
 
 <section>
 
@@ -31,18 +48,55 @@
 
 <!-- Vis personligt tilknyttet arv og aktiver - modul -->
 
-<dialog id="showAssignedAssets">    
+<dialog id="showAssignedAssets">
+    <section>
+        <a>Navn</a>
+        <a>Arveklasse</a>
+    </section>
+    <section>
+        <ul id="listOfPersonalAssets">
+        </ul>    
+    </section>
     <button>Tilføj aktiv</button>   
 </dialog>
 
 <!-- Tilføj aktiv til person - form -->
 
-<form id="addPersonalAsset">
+<form hidden method="post" id="addPersonalAsset">
+
+    <a>Navn</a>
+
+    <!-- Her tænker jeg i skal gøre brug af en select med option groups
+     Options ville være de forskellige kategorier af aktiver.-->
+
+    <label for="asset">Aktiv</label><br>
+    <input type="text" id="asset" name="asset"><br><br>
+
     <button type="submit">Tilføj aktiv til person</button> 
 </form>
 
+<!-- Tilføj arving -->
 
+<form method="post" id="addInheritor"> 
 
+    <label for="name">Navn</label><br>
+    <input type="text" id="name" name="name"><br><br>
+
+    <label for="relation">Relation</label><br>
+    <select id="relation" name="relation" required> 
+        <optgroup label="1. arveklasse">
+            <option value="spouse">Ægtefælle</option>
+            <option value="child">Barn</option>
+        </optgroup>
+        <optgroup label="2. arveklasse">
+            <option value="spou">Ægtefælle</option>
+            <option value="child">Barn</option>
+        </optgroup>
+    </select>
+    <br><br>
+
+    <button type="submit">Tilføj arving til stamtræ</button> 
+</form>
 
 @code {
 
