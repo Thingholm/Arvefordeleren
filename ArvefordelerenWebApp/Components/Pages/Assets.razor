@@ -1,6 +1,30 @@
 @page "/aktiver"
 
+
 <PageTitle>Aktiver</PageTitle>
 
 <h1>Aktiver</h1>
 
+<table>
+    <thead>
+        <th>Aktiv</th>
+        <th>Værdi</th>
+        <th>Likvid?</th>
+    </thead>
+    <tbody>
+        @foreach (Asset asset in assets)
+        {
+            <tr>
+                <td>@asset.Name</td>
+                <td>@asset.Value</td>
+                <td>@(asset.Liquid ? "x" : "")</td>
+                <td><button>Slet</button></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code 
+{
+    private List<Asset> assets = AssetsRepository.GetAssets();
+}
