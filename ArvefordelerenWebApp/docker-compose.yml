@@ -1,0 +1,12 @@
+services:
+  arvefordelerenwebapp:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/src 
+      - /root/.aspnet/DataProtection-Keys 
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
