@@ -9,6 +9,11 @@ public class Inheritor
     {
         Name = name;
     }
+    
+    public Inheritor()
+    {
+        
+    }
         
 
 }
