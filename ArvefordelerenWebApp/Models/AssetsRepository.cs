@@ -25,4 +25,36 @@ public static class AssetsRepository
     {
         return assets.ToList();
     }
+
+    public static void AddAsset(string name, double? value, bool liquid)
+    {
+        if (name == null) return;
+
+        int id = assets.MaxBy(x => x.Id)?.Id + 1 ?? 1;
+
+        assets.Add
+        ( 
+            new Asset() 
+            {
+                Id = id,
+                Name = name,
+                Value = value,
+                Liquid = liquid
+            }
+        );
+    }
+
+    public static void AddAsset(Asset asset)
+    {
+        if (asset.Name == null) return;
+
+        int id = assets.MaxBy(x => x.Id)?.Id + 1 ?? 1;
+
+        assets.Add(asset);
+    }
+
+    public static void DeleteAsset(Asset asset)
+    {
+        assets.Remove(asset);
+    }
 }
