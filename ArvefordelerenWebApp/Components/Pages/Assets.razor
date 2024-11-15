@@ -51,9 +51,8 @@
 <button>Tilføj aktiv</button>
 
 <div>
-    <EditForm Model="newAsset" OnSubmit="@handleAddPersonSubmit" FormName="Jigga">
+    <EditForm Model="newAsset" OnSubmit=@handleAddAssetSubmit FormName="FormAktiv">
         <DataAnnotationsValidator />
-        <ValidationSummary />
         <label>
             Aktiv
             <InputText @bind-Value="newAsset.Name" />
@@ -77,7 +76,8 @@
 {
     private List<Asset> assets = AssetsRepository.GetAssets();
     private Asset? editingAsset = null;
-    private Asset newAsset = new Asset();
+    [SupplyParameterFromForm]
+    private Asset newAsset { get; set; } = new Asset();
 
     private void handleDeleteAsset(Asset asset)
     {
@@ -106,7 +106,7 @@
         }
     }
 
-    private void handleAddPersonSubmit(EditContext editContext)
+    private void handleAddAssetSubmit(EditContext editContext)
     {
         ValidationMessageStore validationMessageStore = new ValidationMessageStore(editContext);
         FieldIdentifier nameField = editContext.Field(nameof(newAsset.Name));

@@ -20,7 +20,7 @@ public static class AssetsRepository
         }
     };
     
-
+    
     public static List<Asset> GetAssets()
     {
         return assets.ToList();
@@ -49,24 +49,20 @@ public static class AssetsRepository
 
     public static void AddAsset(Asset asset)
     {
-        if (asset.Name == null) return;
-
-        int id = assets.MaxBy(x => x.Id)?.Id + 1 ?? 1;
-
-        assets.Add(asset);
+        assets.Add(asset);  // Save to collection or database
     }
 
-    public static void UpdateAsset(Asset updatedAsset)
+    public static void UpdateAsset(Asset asset)
     {
-        var existingAsset = assets.FirstOrDefault(a => a.Id == updatedAsset.Id);
+        var existingAsset = assets.FirstOrDefault(a => a.Id == asset.Id);
         if (existingAsset != null)
         {
-          
-            existingAsset.Name = updatedAsset.Name;
-            existingAsset.Value = updatedAsset.Value;
-            existingAsset.Liquid = updatedAsset.Liquid;
+            existingAsset.Name = asset.Name;
+            existingAsset.Value = asset.Value;
+            existingAsset.Liquid = asset.Liquid;
         }
-    }        
+    }
+
     public static void DeleteAsset(Asset asset)
     {
         assets.Remove(asset);
