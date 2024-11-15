@@ -83,13 +83,14 @@
 
 <!-- Tilføj arving -->
 
+
 <EditForm Model="newInheritor" FormName="formInheritor" OnSubmit="Submit">
     <div>
         <div>
             <label for ="name">Navn:</label>
         </div>
         <div>
-            <InputText @bind-Value="newInheritor.Name"></InputText>
+            <InputText @bind-Value="newInheritor.Name" class="form-control"></InputText>
         </div>
         <button type="submit">Tilføj arving</button>
     </div>
@@ -113,40 +114,23 @@
 <br><br> -->
 
 @code {
-    private List<Inheritor> inheritors {get; set;} = new();
-     protected override void OnInitialized()
+    
+    private List<Inheritor> inheritors = InheritorRepository.GetInheritors();
+     @* protected override void OnInitialized()
     {
         inheritors.Add(new Inheritor("Frederikke"));
         inheritors.Add(new Inheritor("Kristoffer"));
         inheritors.Add(new Inheritor("Gustav"));
-    } 
+    }  *@
 
-    
-    private Inheritor newInheritor = new Inheritor();
+    [SupplyParameterFromForm]
+    private Inheritor newInheritor {get; set;} = new Inheritor();
 
     private void Submit()
     {
-        Inheritor inheritorToBeAdded = new Inheritor(newInheritor.Name);
-        inheritors.Add(inheritorToBeAdded);
-
-        <!-- if(!string.IsNullOrWhiteSpace(newInheritor.Name)) 
-        {
-        inheritors.Add(new Inheritor { Name = newInheritor.Name});
-        newInheritor = new Inheritor();
-        }  -->
+        inheritors.Add(newInheritor);
     }
 
-<!-- private void HandleAdd()
-{
-    // Tilføj den nye arving til listen
-    inheritors.Add(new Inheritor
-    {
-        Name = newInheritor.Name,
-    });
 
-    // Nulstil formularen til næste input
-    
-    newInheritor = new Inheritor();
-} -->
 
 }
