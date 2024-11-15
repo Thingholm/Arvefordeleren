@@ -3,7 +3,9 @@ namespace ArvefordelerenWebApp.Models;
 public class Inheritor
 {
     [Required]
-    public string? Name {get; set;}
+    public string Name {get; set;} = null!;
+
+    public Inheritor() {}
 
     public Inheritor(string name) 
     {

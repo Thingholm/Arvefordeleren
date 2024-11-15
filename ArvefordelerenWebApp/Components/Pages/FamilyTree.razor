@@ -48,10 +48,6 @@
     </table>
 </section>
 
-<section>
-
-</section>
-
 <!-- Vis personligt tilknyttet arv og aktiver - modul -->
 
 <dialog id="showAssignedAssets">
@@ -83,16 +79,17 @@
 
 <!-- Tilføj arving -->
 
-<EditForm Model="newInheritor" FormName="formInheritor" OnSubmit="Submit">
-    <div>
+<EditForm Model="newInheritor" FormName="formInheritor" OnSubmit=@Submit>
+    <InputText @bind-Value="newInheritor.Name"/>
+    <!-- <div>
         <div>
-            <label for ="name">Navn:</label>
+            <label for="name">Navn:</label>
         </div>
         <div>
             <InputText @bind-Value="newInheritor.Name"></InputText>
-        </div>
+        </div> -->
         <button type="submit">Tilføj arving</button>
-    </div>
+    <!-- </div> -->
 </EditForm>
 
 
@@ -113,7 +110,7 @@
 <br><br> -->
 
 @code {
-    private List<Inheritor> inheritors {get; set;} = new();
+    private List<Inheritor> inheritors = new();
      protected override void OnInitialized()
     {
         inheritors.Add(new Inheritor("Frederikke"));
@@ -121,22 +118,15 @@
         inheritors.Add(new Inheritor("Gustav"));
     } 
 
-    
-    private Inheritor? newInheritor;
+    private Inheritor newInheritor = new Inheritor();
 
-    private void Submit()
+    private void Submit(EditContext editContext)
     {
-        Inheritor inheritorToBeAdded = new Inheritor(newInheritor.Name);
-        inheritors.Add(inheritorToBeAdded);
-
-        <!-- if(!string.IsNullOrWhiteSpace(newInheritor.Name)) 
-        {
-        inheritors.Add(new Inheritor { Name = newInheritor.Name});
-        newInheritor = new Inheritor();
-        }  -->
+        Console.WriteLine(newInheritor.Name);
+        inheritors.Add(newInheritor);
     }
 
-<!-- private void HandleAdd()
+private void HandleAdd()
 {
     // Tilføj den nye arving til listen
     inheritors.Add(new Inheritor
@@ -147,6 +137,6 @@
     // Nulstil formularen til næste input
     
     newInheritor = new Inheritor();
-} -->
+}
 
 }
