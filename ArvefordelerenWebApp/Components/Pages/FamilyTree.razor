@@ -19,7 +19,7 @@
 <section class="familyTreeContainer" id="optionsContainer">
 
     <article class="familyTreeOptions">
-  <input type="text" id="tilføj" name="tilføj"> <input type="button">
+        <input type="text" id="tilføj" name="tilføj"> <input type="button">
         <a>Tilføj person til stamtræ</a>
     </article>
 
@@ -39,6 +39,12 @@
             <th> Navn </th>
             <th> Arveklasse </th>
         </tr>
+        @foreach (var inheritor in inheritors) {
+            <tr>
+                <td>@inheritor.Name</td>
+                <td>1</td>
+            </tr>
+        }
     </table>
 </section>
 
@@ -67,7 +73,7 @@
     <a>Navn</a>
 
     <!-- Her tænker jeg i skal gøre brug af en select med option groups
-     Options ville være de forskellige kategorier af aktiver.-->
+    Options ville være de forskellige kategorier af aktiver.-->
 
     <label for="asset">Aktiv</label><br>
     <input type="text" id="asset" name="asset"><br><br>
@@ -77,27 +83,70 @@
 
 <!-- Tilføj arving -->
 
-<form method="post" id="addInheritor"> 
+<EditForm Model="newInheritor" FormName="formInheritor" OnSubmit="Submit">
+    <div>
+        <div>
+            <label for ="name">Navn:</label>
+        </div>
+        <div>
+            <InputText @bind-Value="newInheritor.Name"></InputText>
+        </div>
+        <button type="submit">Tilføj arving</button>
+    </div>
+</EditForm>
 
-    <label for="name">Navn</label><br>
-    <input type="text" id="name" name="name"><br><br>
 
-    <label for="relation">Relation</label><br>
-    <select id="relation" name="relation" required> 
-        <optgroup label="1. arveklasse">
-            <option value="spouse">Ægtefælle</option>
-            <option value="child">Barn</option>
-        </optgroup>
-        <optgroup label="2. arveklasse">
-            <option value="spou">Ægtefælle</option>
-            <option value="child">Barn</option>
-        </optgroup>
-    </select>
-    <br><br>
+<!-- ekstra  -->
 
-    <button type="submit">Tilføj arving til stamtræ</button> 
-</form>
+<!-- 
+<label for="relation">Relation</label><br>
+<select id="relation" name="relation" required> 
+<optgroup label="1. arveklasse">
+<option value="spouse">Ægtefælle</option>
+<option value="child">Barn</option>
+</optgroup>
+<optgroup label="2. arveklasse">
+<option value="spou">Ægtefælle</option>
+<option value="child">Barn</option>
+</optgroup>
+</select>
+<br><br> -->
 
 @code {
+    private List<Inheritor> inheritors {get; set;} = new();
+     protected override void OnInitialized()
+    {
+        inheritors.Add(new Inheritor("Frederikke"));
+        inheritors.Add(new Inheritor("Kristoffer"));
+        inheritors.Add(new Inheritor("Gustav"));
+    } 
+
+    
+    private Inheritor? newInheritor;
+
+    private void Submit()
+    {
+        Inheritor inheritorToBeAdded = new Inheritor(newInheritor.Name);
+        inheritors.Add(inheritorToBeAdded);
+
+        <!-- if(!string.IsNullOrWhiteSpace(newInheritor.Name)) 
+        {
+        inheritors.Add(new Inheritor { Name = newInheritor.Name});
+        newInheritor = new Inheritor();
+        }  -->
+    }
+
+<!-- private void HandleAdd()
+{
+    // Tilføj den nye arving til listen
+    inheritors.Add(new Inheritor
+    {
+        Name = newInheritor.Name,
+    });
+
+    // Nulstil formularen til næste input
+    
+    newInheritor = new Inheritor();
+} -->
 
 }
