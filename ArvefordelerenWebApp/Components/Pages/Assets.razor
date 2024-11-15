@@ -1,5 +1,4 @@
 @page "/aktiver"
-@rendermode InteractiveServer
 
 <PageTitle>Aktiver</PageTitle>
 
@@ -7,18 +6,43 @@
 
 <table>
     <thead>
-        <th>Aktiv</th>
-        <th>Værdi</th>
-        <th>Likvid</th>
+        <tr>
+            <th>Aktiv</th>
+            <th>Værdi</th>
+            <th>Likvid</th>
+            <th>Rediger</th>
+        </tr>
     </thead>
     <tbody>
         @foreach (Asset asset in assets)
         {
             <tr>
-                <td>@asset.Name</td>
-                <td>@asset.Value</td>
-                <td>@(asset.Liquid ? "x" : "")</td>
-                <td><button @onclick="() => handleDeleteAsset(asset)">Slet</button></td>
+                @if (editingAsset == asset)
+                {
+                    <td>
+                        <InputText @bind-Value="asset.Name" />
+                    </td>
+                    <td>
+                        <InputNumber @bind-Value="asset.Value" />
+                    </td>
+                    <td>
+                        <InputCheckbox @bind-Value="asset.Liquid" />
+                    </td>
+                    <td>
+                        <button @onclick="SaveEdit">Gem</button>
+                        <button @onclick="CancelEdit">Annuller</button>
+                    </td>
+                }
+                else
+                {
+                    <td>@asset.Name</td>
+                    <td>@asset.Value</td>
+                    <td>@(asset.Liquid ? "x" : "")</td>
+                    <td>
+                        <button @onclick="() => handleDeleteAsset(asset)">Slet</button>
+                        <button @onclick="() => StartEdit(asset)">Rediger</button>
+                    </td>
+                }
             </tr>
         }
     </tbody>
@@ -27,45 +51,68 @@
 <button>Tilføj aktiv</button>
 
 <div>
-    <EditForm Model="newAsset" OnSubmit=@handleAddPersonSubmit>
+    <EditForm Model="newAsset" OnSubmit="@handleAddPersonSubmit" FormName="Jigga">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
         <label>
             Aktiv
-            <InputText @bind-Value="newAsset!.Name"></InputText>
-            <ValidationMessage For="() => newAsset!.Name"/>
+            <InputText @bind-Value="newAsset.Name" />
+            <ValidationMessage For="() => newAsset.Name" />
         </label>
 
         <label>
             Værdi
-            <InputNumber @bind-Value="newAsset.Value"></InputNumber>
+            <InputNumber @bind-Value="newAsset.Value" />
         </label>
-        
+
         <label>
             Likvid
-            <InputCheckbox @bind-Value="newAsset.Liquid"></InputCheckbox>   
+            <InputCheckbox @bind-Value="newAsset.Liquid" />
         </label>
-        <button type="submit">Tilføj</button>
+        <button type="Submit">Tilføj</button>
     </EditForm>
 </div>
 
 @code 
 {
     private List<Asset> assets = AssetsRepository.GetAssets();
+    private Asset? editingAsset = null;
+    private Asset newAsset = new Asset();
 
     private void handleDeleteAsset(Asset asset)
     {
         AssetsRepository.DeleteAsset(asset);
-        
         assets = AssetsRepository.GetAssets();
     }
 
-    private Asset newAsset = new Asset(); 
+    private void StartEdit(Asset asset)
+    {
+        editingAsset = asset;
+    }
+
+    private void CancelEdit()
+    {
+        editingAsset = null; 
+    }
+
+    private void SaveEdit()
+    {
+        if (editingAsset != null)
+        {
+            
+            AssetsRepository.UpdateAsset(editingAsset);
+            assets = AssetsRepository.GetAssets();
+            editingAsset = null; 
+        }
+    }
+
     private void handleAddPersonSubmit(EditContext editContext)
     {
         ValidationMessageStore validationMessageStore = new ValidationMessageStore(editContext);
         FieldIdentifier nameField = editContext.Field(nameof(newAsset.Name));
         validationMessageStore.Clear();
-        
-        if (string.IsNullOrEmpty(newAsset!.Name)) 
+
+        if (string.IsNullOrEmpty(newAsset.Name))
         {
             validationMessageStore.Add(nameField, "Fejl, mangler at udfylde aktiv feltet");
             return;
@@ -73,7 +120,6 @@
 
         AssetsRepository.AddAsset(newAsset);
         assets = AssetsRepository.GetAssets();
-
         newAsset = new Asset();
     }
 }
