@@ -6,32 +6,33 @@
 
 <h1>Aktiver</h1>
 
-<table>
-    <thead>
-        <tr>
-            <th>Aktiv</th>
-            <th>Værdi</th>
-            <th>Likvid</th>
-            <th>Handlinger</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var asset in assets)
+<Table>
+    <TableHeader>
+        <TableRow>
+            <TableHeaderCell>Aktiv</TableHeaderCell>
+            <TableHeaderCell>Værdi</TableHeaderCell>
+            <TableHeaderCell>Likvid</TableHeaderCell>
+            <TableHeaderCell></TableHeaderCell>
+        </TableRow>
+    </TableHeader>
+    <TableBody>
+        @foreach (Asset asset in assets)
         {
-            <tr>
-                <td>@asset.Name</td>
-                <td>@asset.Value</td>
-                <td>@(asset.Liquid ? "x" : "")</td>
-                <td>
-                    <button @onclick="() => DeleteAsset(asset)">Slet</button>
-                    <button @onclick="() => EditAsset(asset.Id)">Rediger</button>
-                </td>
-            </tr>
+            <TableRow>
+                <TableRowCell class="align-middle">@asset.Name</TableRowCell>
+                <TableRowCell class="align-middle">@asset.Value</TableRowCell>
+                <TableRowCell class="align-middle">@(asset.Liquid ? "x" : "")</TableRowCell>
+                <TableRowCell class="col-1 align-middle">
+                    <Button @onclick="() => EditAsset(asset.Id)"><Icon Name="IconName.Pen"/></Button>
+                    <Button @onclick="() => DeleteAsset(asset)"><Icon Name="IconName.Delete" style="color: #cf0000"/></Button>
+                </TableRowCell>
+            </TableRow>
         }
-    </tbody>
-</table>
+    </TableBody>
+</Table>
 
-<h2>Tilføj Aktiv</h2>
+<Button Color="Color.Primary"><Icon Name="IconName.Add"/> <span class="ms-1">Tilføj Aktiv</span></Button>
+
 <EditForm Model="newAsset" OnSubmit="AddAsset">
     <div>
         <label>Aktiv</label>
