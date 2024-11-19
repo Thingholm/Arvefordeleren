@@ -23,7 +23,7 @@
                 <TableRowCell class="align-middle">@asset.Value</TableRowCell>
                 <TableRowCell class="align-middle">@(asset.Liquid ? "x" : "")</TableRowCell>
                 <TableRowCell class="col-1 align-middle">
-                    <Button @onclick="() => EditAsset(asset.Id)"><Icon Name="IconName.Pen"/></Button>
+                    <EditAsset @bind-Assets="assets" Asset="asset"/>
                     <Button @onclick="() => DeleteAsset(asset)"><Icon Name="IconName.Delete" style="color: #cf0000"/></Button>
                 </TableRowCell>
             </TableRow>
@@ -33,20 +33,12 @@
 
 <AddAsset @bind-Assets=assets/>
 
-
-
 @code {
     private List<Asset> assets = AssetsRepository.GetAssets();
-
     
     private void DeleteAsset(Asset asset)
     {
         AssetsRepository.DeleteAsset(asset);
         assets = AssetsRepository.GetAssets();
-    }
-
-    private void EditAsset(int assetId)
-    {
-        NavigationManager.NavigateTo($"/edit-asset/{assetId}");
     }
 }

@@ -42,44 +42,26 @@ public static class AssetsRepository
     
     
     public static void AddAsset(Asset asset)
-        {
-            if (asset == null || string.IsNullOrWhiteSpace(asset.Name)) return;
-
-            asset.Id = GenerateNewId();
-            assets.Add(asset);
-        }
-
-        public static void UpdateAsset(Asset asset)
-        {
-            var existingAsset = GetAssetById(asset.Id);
-            if (existingAsset != null)
-            {
-                existingAsset.Name = asset.Name;
-                existingAsset.Value = asset.Value;
-                existingAsset.Liquid = asset.Liquid;
-            }
-        }
-
-   
-    public static void UpdateAsset1(int assetId, Asset Asset)
     {
-        if (assetId != Asset.Id) return;
+        if (asset == null || string.IsNullOrWhiteSpace(asset.Name)) return;
 
-        var assetToUpdate = assets.FirstOrDefault(a => a.Id == assetId);
-        if (assetToUpdate != null)
-        {
-            assetToUpdate.Name = Asset.Name;
-            assetToUpdate.Value = Asset.Value;
-            assetToUpdate.Liquid = Asset.Liquid;
-        }
+        asset.Id = GenerateNewId();
+        assets.Add(asset);
     }
 
-    
+    public static void UpdateAsset(Asset asset)
+    {
+        Asset? existingAsset = GetAssetById(asset.Id);
+
+        if (existingAsset == null) return;
+
+        existingAsset.Name = asset.Name;
+        existingAsset.Value = asset.Value;
+        existingAsset.Liquid = asset.Liquid;
+    }
+
     public static void DeleteAsset(Asset asset)
     {
         assets.Remove(asset);
     }
-
-
-
 }

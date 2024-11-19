@@ -1,18 +1,18 @@
 @rendermode InteractiveServer
 
-<Button Color="Color.Primary" @onclick="() => modalRef.Show()"><Icon Name="IconName.Add"/> <span class="ms-1">Tilføj Aktiv</span></Button>
+<Button @onclick="() => modalRef.Show()"><Icon Name="IconName.Pen"/></Button>
 
 <Modal @ref="modalRef">
     <ModalContent>
-        <ModalHeader>Tilføj aktiv         <CloseButton class="me-1"/> </ModalHeader>
+        <ModalHeader>Redigér aktiv <CloseButton class="me-1"/> </ModalHeader>
         <ModalBody>
-            <Validations @ref="validationsRef" Mode="ValidationMode.Manual" Model="newAsset" ValidateOnLoad="false">
+            <Validations @ref="validationsRef" Mode="ValidationMode.Manual" Model="assetToEdit" ValidateOnLoad="false">
                 <Fields>
                     <Validation Validator="ValidationRule.IsNotEmpty">
                         <Field>
                             <FieldLabel>Navn på aktiv</FieldLabel>
                             <FieldBody>
-                                <TextEdit @bind-Text="newAsset.Name">
+                                <TextEdit @bind-Text="assetToEdit.Name">
                                     <Feedback>
                                         <ValidationError>Indtast venligst navnet på aktivet</ValidationError>
                                     </Feedback>
@@ -26,7 +26,7 @@
                     <Field>
                         <FieldLabel>Værdi</FieldLabel>
                         <FieldBody>
-                            <NumericEdit @bind-Value="newAsset.Value"/>
+                            <NumericEdit @bind-Value="assetToEdit.Value"/>
                         </FieldBody>
                     </Field>
                 </Fields>
@@ -34,14 +34,15 @@
                 <Fields>
                     <Field>
                         <FieldBody>
-                            <Check TValue="bool" @bind-Checked="newAsset.Liquid">Kontant</Check>
+                            <Check TValue="bool" @bind-Checked="assetToEdit.Liquid">Kontant</Check>
                         </FieldBody>
                     </Field>
                 </Fields>
             </Validations>
         </ModalBody>
         <ModalFooter>
-            <Button Color="Color.Primary" @onclick="addAsset">Tilføj</Button>
+            <Button Color="Color.Secondary" @onclick="() => cancelChanges()">Annulér ændringer</Button>
+            <Button Color="Color.Primary" @onclick="() => saveChanges()">Gem ændringer</Button>
         </ModalFooter>
     </ModalContent>
 </Modal>
@@ -53,26 +54,46 @@
 
     [Parameter]
     public EventCallback<List<Asset>> AssetsChanged { get; set; }
-
+    [Parameter]
+    public Asset Asset { get; set; } = new Asset();
+    private Asset assetToEdit = new Asset();
     private Modal modalRef = new Modal();
 
     private Validations validationsRef { get; set; } = new Validations();
-    private Asset newAsset = new Asset();
 
-    private async Task addAsset()
+    protected override void OnInitialized()
+    {
+        setAssetToEdit();
+    }
+
+    private void setAssetToEdit()
+    {
+        assetToEdit = new Asset
+        {
+            Id = Asset.Id,
+            Name = Asset.Name,
+            Value = Asset.Value,
+            Liquid = Asset.Liquid,
+        };
+    }
+
+    private async Task saveChanges()
     {
         if (await validationsRef.ValidateAll())
         {
-            AssetsRepository.AddAsset(newAsset);
+            AssetsRepository.UpdateAsset(assetToEdit);
             List<Asset> newAssets = AssetsRepository.GetAssets();
-
             await AssetsChanged.InvokeAsync(newAssets);
-
-            newAsset = new Asset();
 
             await validationsRef.ClearAll();
 
-            modalRef?.Hide();
+            await modalRef.Hide();
         }
+    }
+
+    private void cancelChanges()
+    {
+        setAssetToEdit();
+        modalRef.Hide();
     }
 }
