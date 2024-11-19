@@ -1,3 +1,15 @@
 ﻿@inherits LayoutComponentBase
-@Body
-<link rel="stylesheet" href=NavMenu.css" />
+
+<Layout>
+    <LayoutHeader>
+        <NavMenu />
+    </LayoutHeader>
+
+    <LayoutContent>
+        <main>
+            <article>
+                @Body
+            </article>
+        </main>
+    </LayoutContent>
+</Layout>
