@@ -1,0 +1,152 @@
+@page "/FamilyTree"
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<link rel="stylesheet" href="NavMenu.css" />
+<PageTitle>Stamtræ</PageTitle>
+
+
+
+<div class="nav">
+    <NavLink class="nav-menu">
+        <li><button>Home</button></li>
+        <a></a>
+        <li><button>Export</button></li>
+        <a></a>
+        <li><button>Upload</button></li>
+    </NavLink>
+</div>
+
+
+<section class="familyTreeContainer" id="optionsContainer">
+
+    <article class="familyTreeOptions">
+        <input type="text" id="tilføj" name="tilføj"> <input type="button">
+        <a>Tilføj person til stamtræ</a>
+    </article>
+
+    <article class="familyTreeOptions">
+        <a>Slet person fra stamtræ</a>
+    </article>
+
+    <article class="familyTreeOptions">
+        <a>Se din arv</a>
+    </article>
+
+</section>
+
+<section class="familyTreeContainer" id="familyTree">
+    <table id="tableFamilyTree">
+        <tr class="tableRow">
+            <th> Navn </th>
+            <th> Arveklasse </th>
+            <th>Vælg</th>
+        </tr>
+        @foreach (Inheritor inheritor in inheritors) {
+            <tr>
+                <td>@inheritor.Name</td>
+                <td>@((int)inheritor.ArveKlasse)</td>
+                <td>
+                    <button @onclick="() => UpdateInheritor(inheritor.Id)">Rediger</button>
+                </td>
+                <td>
+                    <button @onclick="() => DeleteInheritor(inheritor.Id)">Slet</button>
+                </td>
+            </tr>
+        }
+    </table>
+</section>
+
+
+<!-- Vis personligt tilknyttet arv og aktiver - modul -->
+
+<dialog id="showAssignedAssets">
+    <section>
+        <a>Navn</a>
+        <a>Arveklasse</a>
+    </section>
+    <section>
+        <ul id="listOfPersonalAssets">
+        </ul>    
+    </section>
+    <button>Tilføj aktiv</button>   
+</dialog>
+
+<!-- Tilføj aktiv til person - form -->
+
+<form hidden method="post" id="addPersonalAsset">
+
+    <a>Navn</a>
+
+    <label for="asset">Aktiv</label><br>
+    <input type="text" id="asset" name="asset"><br><br>
+
+    <button type="submit">Tilføj aktiv til person</button> 
+</form>
+
+<!-- Tilføj arving -->
+
+
+<EditForm Model="newInheritor" FormName="formInheritor" OnSubmit="Submit">
+    <div>
+        <div>
+            <label for ="name">Navn:</label>
+        </div>
+        <div>
+            <InputText @bind-Value="newInheritor.Name" class="form-control"></InputText>
+        </div>
+        <div>
+            <label for="inheritorType">Arveklasse:</label>
+        </div>
+        <div>
+            <InputSelect @bind-Value="newInheritor.ArveKlasse" class="form-control">
+                <option value="">Vælg arveklasse...</option>
+                <option checked="@(newInheritor.ArveKlasse == ArveKlasse.Type1)" value="@((int)ArveKlasse.Type1)">@((int)ArveKlasse.Type1)</option>
+                <option checked="@(newInheritor.ArveKlasse == ArveKlasse.Type2)" value="@((int)ArveKlasse.Type2)">@((int)ArveKlasse.Type2)</option>
+                <option checked="@(newInheritor.ArveKlasse == ArveKlasse.Type3)" value="@((int)ArveKlasse.Type3)">@((int)ArveKlasse.Type3)</option>
+            </InputSelect>
+        </div>
+        <button type="submit">Tilføj arving</button>
+    </div>
+</EditForm>
+
+
+@code {
+
+    private List<Inheritor> inheritors = InheritorRepository.GetInheritors();
+
+    [SupplyParameterFromForm]
+    private Inheritor newInheritor {get; set;} = new Inheritor();
+
+    private int nextId => inheritors.Any() ? inheritors.Max(i => i.Id) + 1 : 0;
+
+    private void Submit()
+    {
+
+        newInheritor.Id = nextId;
+
+        inheritors.Add(newInheritor);
+
+        // Ryd formen
+        newInheritor = new Inheritor();
+    }
+
+
+    private void DeleteInheritor(int inheritorId)
+    {
+        Inheritor inheritorToRemove = inheritors.FirstOrDefault(i => i.Id == inheritorId);
+        if (inheritorToRemove != null)
+        {
+            inheritors.Remove(inheritorToRemove);
+        }
+
+        StateHasChanged();
+    }
+
+    private void UpdateInheritor(int inheritorId) 
+    {
+        NavigationManager.NavigateTo($"edit-inheritor/{inheritorId}");
+    }
+}
+
+
