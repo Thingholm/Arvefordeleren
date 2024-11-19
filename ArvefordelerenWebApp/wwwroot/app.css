@@ -5,6 +5,32 @@ html, body {
 a, .btn-link {
     color: #006bb7;
 }
+.nav {
+    display: flex    ;
+    border: 5px blue solid;
+    justify-content: space-between;
+    
+}
+
+.nav {
+    justify-content: space-around;
+}
+
+#optionsContainer {
+    border: red 5px solid;
+    margin-top: 50px;
+}
+
+.familyTreeOptions {
+    margin-top: 50px;
+    margin-right: -200px;
+    border:  blue 5px solid;
+    justify-content: space-around;
+}
+
+
+
+
 
 .btn-primary {
     color: #fff;
