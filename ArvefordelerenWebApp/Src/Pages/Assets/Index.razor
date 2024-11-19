@@ -18,7 +18,7 @@
     <TableBody>
         @foreach (Asset asset in assets)
         {
-            <TableRow>
+            <TableRow @key="asset.Id">
                 <TableRowCell class="align-middle">@asset.Name</TableRowCell>
                 <TableRowCell class="align-middle">@asset.Value</TableRowCell>
                 <TableRowCell class="align-middle">@(asset.Liquid ? "x" : "")</TableRowCell>
@@ -31,46 +31,14 @@
     </TableBody>
 </Table>
 
-<Button Color="Color.Primary"><Icon Name="IconName.Add"/> <span class="ms-1">Tilføj Aktiv</span></Button>
+<AddAsset @bind-Assets=assets/>
 
-<EditForm Model="newAsset" OnSubmit="AddAsset">
-    <div>
-        <label>Aktiv</label>
-        <InputText @bind-Value="newAsset.Name" />
-        <ValidationMessage For="() => newAsset.Name" />
-    </div>
-    <div>
-        <label>Værdi</label>
-        <InputNumber @bind-Value="newAsset.Value" />
-    </div>
-    <div>
-        <label>Likvid</label>
-        <InputCheckbox @bind-Value="newAsset.Liquid" />
-    </div>
-    <button type="submit">Tilfø</button>
-</EditForm>
+
 
 @code {
     private List<Asset> assets = AssetsRepository.GetAssets();
-    private Asset newAsset = new Asset();
 
-    private void AddAsset(EditContext editContext)
-    {
-        ValidationMessageStore validationMessageStore = new ValidationMessageStore(editContext);
-        FieldIdentifier nameField = editContext.Field(nameof(newAsset.Name));
-        validationMessageStore.Clear();
-        
-        if (string.IsNullOrEmpty(newAsset!.Name)) 
-        {
-            validationMessageStore.Add(nameField, "Fejl, mangler at udfylde aktiv feltet");
-            return;
-        }
-        AssetsRepository.AddAsset(newAsset);
-        assets = AssetsRepository.GetAssets();
-
-        newAsset = new Asset();
-    }
-
+    
     private void DeleteAsset(Asset asset)
     {
         AssetsRepository.DeleteAsset(asset);

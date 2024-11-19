@@ -1,0 +1,78 @@
+@rendermode InteractiveServer
+
+<Button Color="Color.Primary" @onclick="() => modalRef?.Show()"><Icon Name="IconName.Add"/> <span class="ms-1">Tilføj Aktiv</span></Button>
+
+<Modal @ref="modalRef">
+    <ModalContent>
+        <ModalHeader>Tilføj aktiv         <CloseButton class="me-1"/> </ModalHeader>
+        <ModalBody>
+            <Validations @ref="validationsRef" Mode="ValidationMode.Manual" Model="newAsset" ValidateOnLoad="false">
+                <Fields>
+                    <Validation Validator="ValidationRule.IsNotEmpty">
+                        <Field>
+                            <FieldLabel>Navn på aktiv</FieldLabel>
+                            <FieldBody>
+                                <TextEdit @bind-Text="newAsset.Name">
+                                    <Feedback>
+                                        <ValidationError>Indtast venligst navnet på aktivet</ValidationError>
+                                    </Feedback>
+                                </TextEdit>
+                            </FieldBody>
+                        </Field>
+                    </Validation>
+                </Fields>
+
+                <Fields>
+                    <Field>
+                        <FieldLabel>Værdi</FieldLabel>
+                        <FieldBody>
+                            <NumericEdit @bind-Value="newAsset.Value"/>
+                        </FieldBody>
+                    </Field>
+                </Fields>
+
+                <Fields>
+                    <Field>
+                        <FieldBody>
+                            <Check TValue="bool" @bind-Checked="newAsset.Liquid">Kontant</Check>
+                        </FieldBody>
+                    </Field>
+                </Fields>
+            </Validations>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Primary" @onclick="addAsset">Tilføj</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+@code 
+{
+    [Parameter]
+    public List<Asset> Assets { get; set; } = new List<Asset>();
+
+    [Parameter]
+    public EventCallback<List<Asset>> AssetsChanged { get; set; }
+
+    private Modal? modalRef;
+
+    private Validations validationsRef { get; set; }
+    private Asset newAsset = new Asset();
+
+    private async Task addAsset()
+    {
+        if (await validationsRef.ValidateAll())
+        {
+            AssetsRepository.AddAsset(newAsset);
+            List<Asset> newAssets = AssetsRepository.GetAssets();
+
+            await AssetsChanged.InvokeAsync(newAssets);
+
+            newAsset = new Asset();
+
+            await validationsRef.ClearAll();
+
+            modalRef?.Hide();
+        }
+    }
+}
