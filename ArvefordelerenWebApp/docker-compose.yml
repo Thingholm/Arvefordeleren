@@ -7,6 +7,8 @@ services:
       - "8080:8080"
     volumes:
       - .:/src 
+      - /src/bin
+      - /src/obj
       - /root/.aspnet/DataProtection-Keys 
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
