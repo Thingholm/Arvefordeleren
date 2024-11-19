@@ -1,4 +1,4 @@
-using ArvefordelerenWebApp.Components;
+using ArvefordelerenWebApp.Src;
 using Blazorise;
 using Blazorise.Bootstrap5;
 using Blazorise.Icons.FontAwesome;
