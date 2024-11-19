@@ -44,9 +44,6 @@ public static class AssetsRepository
         );
     }
 
-    
-
-
     public static void AddAsset(Asset asset)
     {
         if (asset.Name == null) return;
@@ -56,17 +53,6 @@ public static class AssetsRepository
         assets.Add(asset);
     }
 
-    public static void UpdateAsset(Asset updatedAsset)
-    {
-        var existingAsset = assets.FirstOrDefault(a => a.Id == updatedAsset.Id);
-        if (existingAsset != null)
-        {
-          
-            existingAsset.Name = updatedAsset.Name;
-            existingAsset.Value = updatedAsset.Value;
-            existingAsset.Liquid = updatedAsset.Liquid;
-        }
-    }        
     public static void DeleteAsset(Asset asset)
     {
         assets.Remove(asset);
