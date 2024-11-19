@@ -1,4 +1,6 @@
 @page "/FamilyTree"
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 
 <link rel="stylesheet" href="NavMenu.css" />
 <PageTitle>Stamtræ</PageTitle>
@@ -38,19 +40,23 @@
         <tr class="tableRow">
             <th> Navn </th>
             <th> Arveklasse </th>
+            <th>Vælg</th>
         </tr>
-        @foreach (var inheritor in inheritors) {
+        @foreach (Inheritor inheritor in inheritors) {
             <tr>
                 <td>@inheritor.Name</td>
-                <td>1</td>
+                <td>@((int)inheritor.ArveKlasse)</td>
+                <td>
+                    <button @onclick="() => UpdateInheritor(inheritor.Id)">Rediger</button>
+                </td>
+                <td>
+                    <button @onclick="() => DeleteInheritor(inheritor.Id)">Slet</button>
+                </td>
             </tr>
         }
     </table>
 </section>
 
-<section>
-
-</section>
 
 <!-- Vis personligt tilknyttet arv og aktiver - modul -->
 
@@ -72,9 +78,6 @@
 
     <a>Navn</a>
 
-    <!-- Her tænker jeg i skal gøre brug af en select med option groups
-    Options ville være de forskellige kategorier af aktiver.-->
-
     <label for="asset">Aktiv</label><br>
     <input type="text" id="asset" name="asset"><br><br>
 
@@ -92,45 +95,58 @@
         <div>
             <InputText @bind-Value="newInheritor.Name" class="form-control"></InputText>
         </div>
+        <div>
+            <label for="inheritorType">Arveklasse:</label>
+        </div>
+        <div>
+            <InputSelect @bind-Value="newInheritor.ArveKlasse" class="form-control">
+                <option value="">Vælg arveklasse...</option>
+                <option checked="@(newInheritor.ArveKlasse == ArveKlasse.Type1)" value="@((int)ArveKlasse.Type1)">@((int)ArveKlasse.Type1)</option>
+                <option checked="@(newInheritor.ArveKlasse == ArveKlasse.Type2)" value="@((int)ArveKlasse.Type2)">@((int)ArveKlasse.Type2)</option>
+                <option checked="@(newInheritor.ArveKlasse == ArveKlasse.Type3)" value="@((int)ArveKlasse.Type3)">@((int)ArveKlasse.Type3)</option>
+            </InputSelect>
+        </div>
         <button type="submit">Tilføj arving</button>
     </div>
 </EditForm>
 
 
-<!-- ekstra  -->
-
-<!-- 
-<label for="relation">Relation</label><br>
-<select id="relation" name="relation" required> 
-<optgroup label="1. arveklasse">
-<option value="spouse">Ægtefælle</option>
-<option value="child">Barn</option>
-</optgroup>
-<optgroup label="2. arveklasse">
-<option value="spou">Ægtefælle</option>
-<option value="child">Barn</option>
-</optgroup>
-</select>
-<br><br> -->
-
 @code {
-    
+
     private List<Inheritor> inheritors = InheritorRepository.GetInheritors();
-     @* protected override void OnInitialized()
-    {
-        inheritors.Add(new Inheritor("Frederikke"));
-        inheritors.Add(new Inheritor("Kristoffer"));
-        inheritors.Add(new Inheritor("Gustav"));
-    }  *@
 
     [SupplyParameterFromForm]
     private Inheritor newInheritor {get; set;} = new Inheritor();
 
+    private int nextId => inheritors.Any() ? inheritors.Max(i => i.Id) + 1 : 0;
+
     private void Submit()
     {
+
+        newInheritor.Id = nextId;
+
         inheritors.Add(newInheritor);
+
+        // Ryd formen
+        newInheritor = new Inheritor();
     }
 
 
+    private void DeleteInheritor(int inheritorId)
+    {
+        Inheritor inheritorToRemove = inheritors.FirstOrDefault(i => i.Id == inheritorId);
+        if (inheritorToRemove != null)
+        {
+            inheritors.Remove(inheritorToRemove);
+        }
 
+        StateHasChanged();
+    }
+
+    private void UpdateInheritor(int inheritorId) 
+    {
+        NavigationManager.NavigateTo($"edit-inheritor/{inheritorId}");
+    }
 }
+
+

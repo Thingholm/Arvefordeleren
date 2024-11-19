@@ -10,3 +10,5 @@ services:
       - /root/.aspnet/DataProtection-Keys 
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+    stdin_open: true
+    tty: true
