@@ -19,42 +19,67 @@ public static class AssetsRepository
             Liquid = false
         }
     };
-    
 
-    public static List<Asset> GetAssets()
-    {
-        return assets.ToList();
-    }
+    private static int GenerateNewId() => assets.MaxBy(x => x.Id)?.Id + 1 ?? 1;
+
+    public static List<Asset> GetAssets() => assets.ToList();
+
+     public static Asset? GetAssetById(int id) => assets.FirstOrDefault(a => a.Id == id);
 
     public static void AddAsset(string name, double? value, bool liquid)
     {
-        if (name == null) return;
+        if (string.IsNullOrWhiteSpace(name)) return;
 
-        int id = assets.MaxBy(x => x.Id)?.Id + 1 ?? 1;
-
-        assets.Add
-        ( 
-            new Asset() 
-            {
-                Id = id,
-                Name = name,
-                Value = value,
-                Liquid = liquid
-            }
-        );
+        int id = GenerateNewId();
+        assets.Add(new Asset
+        {
+            Id = id,
+            Name = name,
+            Value = value,
+            Liquid = liquid
+        });
     }
-
+    
+    
     public static void AddAsset(Asset asset)
+        {
+            if (asset == null || string.IsNullOrWhiteSpace(asset.Name)) return;
+
+            asset.Id = GenerateNewId();
+            assets.Add(asset);
+        }
+
+        public static void UpdateAsset(Asset asset)
+        {
+            var existingAsset = GetAssetById(asset.Id);
+            if (existingAsset != null)
+            {
+                existingAsset.Name = asset.Name;
+                existingAsset.Value = asset.Value;
+                existingAsset.Liquid = asset.Liquid;
+            }
+        }
+
+   
+    public static void UpdateAsset1(int assetId, Asset Asset)
     {
-        if (asset.Name == null) return;
+        if (assetId != Asset.Id) return;
 
-        int id = assets.MaxBy(x => x.Id)?.Id + 1 ?? 1;
-
-        assets.Add(asset);
+        var assetToUpdate = assets.FirstOrDefault(a => a.Id == assetId);
+        if (assetToUpdate != null)
+        {
+            assetToUpdate.Name = Asset.Name;
+            assetToUpdate.Value = Asset.Value;
+            assetToUpdate.Liquid = Asset.Liquid;
+        }
     }
 
+    
     public static void DeleteAsset(Asset asset)
     {
         assets.Remove(asset);
     }
+
+
+
 }

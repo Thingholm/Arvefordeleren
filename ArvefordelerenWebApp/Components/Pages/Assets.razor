@@ -1,4 +1,5 @@
 @page "/aktiver"
+@inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
 <PageTitle>Aktiver</PageTitle>
@@ -7,59 +8,52 @@
 
 <table>
     <thead>
-        <th>Aktiv</th>
-        <th>Værdi</th>
-        <th>Likvid</th>
+        <tr>
+            <th>Aktiv</th>
+            <th>Værdi</th>
+            <th>Likvid</th>
+            <th>Handlinger</th>
+        </tr>
     </thead>
     <tbody>
-        @foreach (Asset asset in assets)
+        @foreach (var asset in assets)
         {
             <tr>
                 <td>@asset.Name</td>
                 <td>@asset.Value</td>
                 <td>@(asset.Liquid ? "x" : "")</td>
-                <td><button @onclick="() => handleDeleteAsset(asset)">Slet</button></td>
+                <td>
+                    <button @onclick="() => DeleteAsset(asset)">Slet</button>
+                    <button @onclick="() => EditAsset(asset.Id)">Rediger</button>
+                </td>
             </tr>
         }
     </tbody>
 </table>
 
-<button>Tilføj aktiv</button>
+<h2>Tilføj Aktiv</h2>
+<EditForm Model="newAsset" OnSubmit="AddAsset">
+    <div>
+        <label>Aktiv</label>
+        <InputText @bind-Value="newAsset.Name" />
+        <ValidationMessage For="() => newAsset.Name" />
+    </div>
+    <div>
+        <label>Værdi</label>
+        <InputNumber @bind-Value="newAsset.Value" />
+    </div>
+    <div>
+        <label>Likvid</label>
+        <InputCheckbox @bind-Value="newAsset.Liquid" />
+    </div>
+    <button type="submit">Tilfø</button>
+</EditForm>
 
-<div>
-    <EditForm Model="newAsset" OnSubmit=@handleAddPersonSubmit>
-        <label>
-            Aktiv
-            <InputText @bind-Value="newAsset!.Name"></InputText>
-            <ValidationMessage For="() => newAsset!.Name"/>
-        </label>
-
-        <label>
-            Værdi
-            <InputNumber @bind-Value="newAsset.Value"></InputNumber>
-        </label>
-        
-        <label>
-            Likvid
-            <InputCheckbox @bind-Value="newAsset.Liquid"></InputCheckbox>   
-        </label>
-        <button type="submit">Tilføj</button>
-    </EditForm>
-</div>
-
-@code 
-{
+@code {
     private List<Asset> assets = AssetsRepository.GetAssets();
+    private Asset newAsset = new Asset();
 
-    private void handleDeleteAsset(Asset asset)
-    {
-        AssetsRepository.DeleteAsset(asset);
-        
-        assets = AssetsRepository.GetAssets();
-    }
-
-    private Asset newAsset = new Asset(); 
-    private void handleAddPersonSubmit(EditContext editContext)
+    private void AddAsset(EditContext editContext)
     {
         ValidationMessageStore validationMessageStore = new ValidationMessageStore(editContext);
         FieldIdentifier nameField = editContext.Field(nameof(newAsset.Name));
@@ -70,10 +64,20 @@
             validationMessageStore.Add(nameField, "Fejl, mangler at udfylde aktiv feltet");
             return;
         }
-
         AssetsRepository.AddAsset(newAsset);
         assets = AssetsRepository.GetAssets();
 
         newAsset = new Asset();
+    }
+
+    private void DeleteAsset(Asset asset)
+    {
+        AssetsRepository.DeleteAsset(asset);
+        assets = AssetsRepository.GetAssets();
+    }
+
+    private void EditAsset(int assetId)
+    {
+        NavigationManager.NavigateTo($"/edit-asset/{assetId}");
     }
 }
