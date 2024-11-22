@@ -20,7 +20,7 @@
                     <TableRowCell class="align-middle">@inheritor.Name</TableRowCell>
                     <TableRowCell class="align-middle">@((int)inheritor.InheritorType)</TableRowCell>
                     <TableRowCell class="col-1 align-middle">
-                        <Button @onclick="() => UpdateInheritor(inheritor.Id)"><Icon Name="IconName.Pen"/></Button>
+                        <EditInheritor @bind-Inheritors="inheritors" Inheritor="inheritor"/>
                         <Button @onclick="() => DeleteInheritor(inheritor)"><Icon Name="IconName.Delete" style="color: #cf0000"/></Button>
                     </TableRowCell>
                 </TableRow>
