@@ -1,0 +1,76 @@
+@rendermode InteractiveServer
+
+<Button Color="Color.Primary" @onclick="() => modalRef.Show()"><Icon Name="IconName.Add"/> <span class="ms-1">Tilføj arving</span></Button>
+
+<Modal @ref="modalRef">
+    <ModalContent>
+        <ModalHeader>Tilføj arving <CloseButton class="me-1"/> </ModalHeader>
+        <ModalBody>
+            <Validations @ref="validationsRef" Mode="ValidationMode.Manual" Model="newInheritor" ValidateOnLoad="false">
+                <Validation Validator="ValidationRule.IsNotEmpty">
+                    <Field>
+                        <FieldLabel>Navn på arving</FieldLabel>
+                        <FieldBody>
+                            <TextEdit @bind-Text="newInheritor.Name">
+                                <Feedback>
+                                    <ValidationError>Indtast venligst et navn</ValidationError>
+                                </Feedback>
+                            </TextEdit>
+                        </FieldBody>
+                    </Field>
+                </Validation>
+
+                <Validation Validator=validateInheritorClassSelect>
+                    <Field>
+                        <FieldLabel>Arveklasse</FieldLabel>
+                        <FieldBody>
+                            <Select TValue=InheritorType @bind-SelectedValue=newInheritor.InheritorType>
+                                <SelectItem value="@(InheritorType.TypeEmpty)">- Vælg venligst en arveklasse -</SelectItem>
+                                <SelectItem value="@(InheritorType.Type1)">@((int)InheritorType.Type1)</SelectItem>
+                                <SelectItem value="@(InheritorType.Type2)">@((int)InheritorType.Type2)</SelectItem>
+                                <SelectItem value="@(InheritorType.Type3)">@((int)InheritorType.Type3)</SelectItem>
+                            </Select>
+                        </FieldBody>
+                    </Field>
+                </Validation>
+            </Validations>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Primary" @onclick="addInheritor">Tilføj</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+@code 
+{
+    [Parameter]
+    public List<Inheritor> Inheritors { get; set; } = new List<Inheritor>();
+    [Parameter]
+    public EventCallback<List<Inheritor>> InheritorsChanged { get; set; }
+
+    private Modal modalRef = new Modal();
+    private Validations validationsRef { get; set; } = new Validations();
+
+    private Inheritor newInheritor = new Inheritor();
+
+    private async Task addInheritor()
+    {
+        if (await validationsRef.ValidateAll())
+        {
+            Inheritors.Add(newInheritor);
+
+            await InheritorsChanged.InvokeAsync(Inheritors);
+
+            newInheritor = new Inheritor();
+
+            await validationsRef.ClearAll();
+
+            modalRef?.Hide();
+        }
+    }
+
+    private void validateInheritorClassSelect(ValidatorEventArgs e)
+    {
+        e.Status = (InheritorType)e.Value == InheritorType.TypeEmpty ? ValidationStatus.Error : ValidationStatus.Success;
+    }
+}
