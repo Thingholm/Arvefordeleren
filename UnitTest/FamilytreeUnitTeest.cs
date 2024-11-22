@@ -100,5 +100,24 @@ namespace InheritorRepositoryTests
             Assert.AreEqual(5, inheritors.Count);
             Assert.IsFalse(inheritors.Any(i => i.Name == "Nonexistent Inheritor"));
         }
+        [TestMethod]
+        public void AddInheritor_ShouldAddNewInheritor()
+        {
+            // Arrange
+            Inheritor newInheritor = new Inheritor
+            {
+                Name = "New Inheritor",
+                InheritorType = InheritorType.Type3
+            };
+
+            // Act
+            InheritorRepository.AddInheritor(newInheritor);
+
+            // Assert
+            var inheritors = InheritorRepository.GetInheritors();
+            Assert.AreEqual(6, inheritors.Count);
+            Assert.IsTrue(inheritors.Any(i => i.Name == "New Inheritor" && i.InheritorType == InheritorType.Type3));
+            Assert.AreEqual(6, newInheritor.Id); // Ensure the new inheritor has the correct ID
+        }
     }
 }

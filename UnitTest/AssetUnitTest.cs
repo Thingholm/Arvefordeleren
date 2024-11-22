@@ -63,7 +63,7 @@ namespace AssetsRepositoryTests
         public void AddAsset()
         {
             // Arrange
-            var newAsset = new Asset
+            Asset newAsset = new Asset
             {
                 Name = "Bil",
                 Value = 100.0,
