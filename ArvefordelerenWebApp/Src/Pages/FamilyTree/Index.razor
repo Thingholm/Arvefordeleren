@@ -5,7 +5,7 @@
 <PageTitle>Stamtræ</PageTitle>
 
 <section class="familyTreeContainer" id="familyTree">
-<<<<<<< HEAD
+
     <Table id="tableFamilyTree">
         <TableHeader>
             <TableRow class="tableRow">
@@ -19,7 +19,7 @@
             @foreach (Inheritor inheritor in inheritors) {
                 <TableRow>
                     <TableRowCell class="align-middle">@inheritor.Name</TableRowCell>
-                    <TableRowCell class="align-middle">@((int)inheritor.ArveKlasse)</TableRowCell>
+                    <TableRowCell class="align-middle">@((int)inheritor.InheritorType)</TableRowCell>
                     <TableRowCell class="col-1 align-middle">
                         <Button @onclick="() => UpdateInheritor(inheritor.Id)"><Icon Name="IconName.Pen"/></Button>
                         <Button @onclick="() => DeleteInheritor(inheritor.Id)"><Icon Name="IconName.Delete" style="color: #cf0000"/></Button>
@@ -28,7 +28,6 @@
             }
         </TableBody>
     </Table>
-=======
     <table id="tableFamilyTree">
         <tr class="tableRow">
             <th> Navn </th>
@@ -48,7 +47,6 @@
             </tr>
         }
     </table>
->>>>>>> d1ec88a241b005ab95e709f4ff94ed6f02782d98
 </section>
 
 
@@ -80,9 +78,8 @@
 
 <!-- Tilføj arving -->
 
-<<<<<<< HEAD
+
 <AddInheritor @bind-Inheritors=inheritors/>
-=======
 
 <EditForm Model="newInheritor" FormName="formInheritor" OnSubmit="Submit">
     <div>
@@ -106,7 +103,6 @@
         <button type="submit">Tilføj arving</button>
     </div>
 </EditForm>
->>>>>>> d1ec88a241b005ab95e709f4ff94ed6f02782d98
 
 
 @code {
