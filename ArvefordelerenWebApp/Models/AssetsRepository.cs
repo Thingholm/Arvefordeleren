@@ -1,3 +1,5 @@
+using ArvefordelerenWebApp.Utilities;
+
 namespace ArvefordelerenWebApp.Models;
 
 public static class AssetsRepository
@@ -20,8 +22,6 @@ public static class AssetsRepository
         }
     };
 
-    private static int GenerateNewId() => assets.MaxBy(x => x.Id)?.Id + 1 ?? 1;
-
     public static List<Asset> GetAssets() => assets.ToList();
 
      public static Asset? GetAssetById(int id) => assets.FirstOrDefault(a => a.Id == id);
@@ -30,7 +30,7 @@ public static class AssetsRepository
     {
         if (string.IsNullOrWhiteSpace(name)) return;
 
-        int id = GenerateNewId();
+        int id = assets.GenerateId();
         assets.Add(new Asset
         {
             Id = id,
@@ -45,7 +45,7 @@ public static class AssetsRepository
     {
         if (asset == null || string.IsNullOrWhiteSpace(asset.Name)) return;
 
-        asset.Id = GenerateNewId();
+        asset.Id = assets.GenerateId();
         assets.Add(asset);
     }
 
