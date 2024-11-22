@@ -116,7 +116,7 @@ namespace InheritorRepositoryTests
             // Assert
             var inheritors = InheritorRepository.GetInheritors();
             Assert.AreEqual(6, inheritors.Count);
-            Assert.IsTrue(inheritors.Any(i => i.Name == "New Inheritor" && i.InheritorType == InheritorType.Type3));
+            Assert.IsTrue(inheritors.Any(i => i.Name == "Gulle" && i.InheritorType == InheritorType.Type3));
             Assert.AreEqual(6, newInheritor.Id); // Ensure the new inheritor has the correct ID
             Assert.AreEqual("Gulle", newInheritor.Name);
         }
