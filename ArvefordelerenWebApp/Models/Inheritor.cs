@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 namespace ArvefordelerenWebApp.Models;
-public class Inheritor
+public class Inheritor : IModel
 {
     [Required]
     public int Id { get; set; }
