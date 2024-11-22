@@ -1,51 +1,44 @@
-@page "/FamilyTree"
+@page "/stamtræ"
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
-<link rel="stylesheet" href="NavMenu.css" />
 <PageTitle>Stamtræ</PageTitle>
 
-
-
-<div class="nav">
-    <NavLink class="nav-menu">
-        <li><button>Home</button></li>
-        <a></a>
-        <li><button>Export</button></li>
-        <a></a>
-        <li><button>Upload</button></li>
-    </NavLink>
-</div>
-
-
-<section class="familyTreeContainer" id="optionsContainer">
-
-    <article class="familyTreeOptions">
-        <input type="text" id="tilføj" name="tilføj"> <input type="button">
-        <a>Tilføj person til stamtræ</a>
-    </article>
-
-    <article class="familyTreeOptions">
-        <a>Slet person fra stamtræ</a>
-    </article>
-
-    <article class="familyTreeOptions">
-        <a>Se din arv</a>
-    </article>
-
-</section>
-
 <section class="familyTreeContainer" id="familyTree">
+<<<<<<< HEAD
+    <Table id="tableFamilyTree">
+        <TableHeader>
+            <TableRow class="tableRow">
+                <TableHeaderCell>Navn</TableHeaderCell>
+                <TableHeaderCell>Arveklasse</TableHeaderCell>
+                <TableHeaderCell></TableHeaderCell>
+            </TableRow>
+        </TableHeader>
+
+        <TableBody>
+            @foreach (Inheritor inheritor in inheritors) {
+                <TableRow>
+                    <TableRowCell class="align-middle">@inheritor.Name</TableRowCell>
+                    <TableRowCell class="align-middle">@((int)inheritor.ArveKlasse)</TableRowCell>
+                    <TableRowCell class="col-1 align-middle">
+                        <Button @onclick="() => UpdateInheritor(inheritor.Id)"><Icon Name="IconName.Pen"/></Button>
+                        <Button @onclick="() => DeleteInheritor(inheritor.Id)"><Icon Name="IconName.Delete" style="color: #cf0000"/></Button>
+                    </TableRowCell>
+                </TableRow>
+            }
+        </TableBody>
+    </Table>
+=======
     <table id="tableFamilyTree">
         <tr class="tableRow">
             <th> Navn </th>
-            <th> Arveklasse </th>
+            <th> InheritorType </th>
             <th>Vælg</th>
         </tr>
         @foreach (Inheritor inheritor in inheritors) {
             <tr>
                 <td>@inheritor.Name</td>
-                <td>@((int)inheritor.ArveKlasse)</td>
+                <td>@((int)inheritor.InheritorType)</td>
                 <td>
                     <button @onclick="() => UpdateInheritor(inheritor.Id)">Rediger</button>
                 </td>
@@ -55,6 +48,7 @@
             </tr>
         }
     </table>
+>>>>>>> d1ec88a241b005ab95e709f4ff94ed6f02782d98
 </section>
 
 
@@ -86,6 +80,9 @@
 
 <!-- Tilføj arving -->
 
+<<<<<<< HEAD
+<AddInheritor @bind-Inheritors=inheritors/>
+=======
 
 <EditForm Model="newInheritor" FormName="formInheritor" OnSubmit="Submit">
     <div>
@@ -99,24 +96,24 @@
             <label for="inheritorType">Arveklasse:</label>
         </div>
         <div>
-            <InputSelect @bind-Value="newInheritor.ArveKlasse" class="form-control">
+            <InputSelect @bind-Value="newInheritor.InheritorType" class="form-control">
                 <option value="">Vælg arveklasse...</option>
-                <option checked="@(newInheritor.ArveKlasse == ArveKlasse.Type1)" value="@((int)ArveKlasse.Type1)">@((int)ArveKlasse.Type1)</option>
-                <option checked="@(newInheritor.ArveKlasse == ArveKlasse.Type2)" value="@((int)ArveKlasse.Type2)">@((int)ArveKlasse.Type2)</option>
-                <option checked="@(newInheritor.ArveKlasse == ArveKlasse.Type3)" value="@((int)ArveKlasse.Type3)">@((int)ArveKlasse.Type3)</option>
+                <option checked="@(newInheritor.InheritorType == InheritorType.Type1)" value="@((int)InheritorType.Type1)">@((int)InheritorType.Type1)</option>
+                <option checked="@(newInheritor.InheritorType == InheritorType.Type2)" value="@((int)InheritorType.Type2)">@((int)InheritorType.Type2)</option>
+                <option checked="@(newInheritor.InheritorType == InheritorType.Type3)" value="@((int)InheritorType.Type3)">@((int)InheritorType.Type3)</option>
             </InputSelect>
         </div>
         <button type="submit">Tilføj arving</button>
     </div>
 </EditForm>
+>>>>>>> d1ec88a241b005ab95e709f4ff94ed6f02782d98
 
 
 @code {
 
     private List<Inheritor> inheritors = InheritorRepository.GetInheritors();
 
-    [SupplyParameterFromForm]
-    private Inheritor newInheritor {get; set;} = new Inheritor();
+    private Inheritor newInheritor = new Inheritor();
 
     private int nextId => inheritors.Any() ? inheritors.Max(i => i.Id) + 1 : 0;
 
