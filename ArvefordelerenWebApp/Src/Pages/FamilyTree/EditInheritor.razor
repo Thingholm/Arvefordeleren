@@ -16,11 +16,11 @@
         </div>
         <div>     
             <label for="inheritorType">Arveklasse:</label>
-            <InputSelect @bind-Value="inheritor.ArveKlasse" class="form-control">
+            <InputSelect @bind-Value="inheritor.InheritorType" class="form-control">
                 <option value="">Vælg arveklasse...</option>
-                <option checked="@(inheritor.ArveKlasse == ArveKlasse.Type1)" value="@((int)ArveKlasse.Type1)">@((int)ArveKlasse.Type1)</option>
-                <option checked="@(inheritor.ArveKlasse == ArveKlasse.Type2)" value="@((int)ArveKlasse.Type2)">@((int)ArveKlasse.Type2)</option>
-                <option checked="@(inheritor.ArveKlasse == ArveKlasse.Type3)" value="@((int)ArveKlasse.Type3)">@((int)ArveKlasse.Type3)</option>
+                <option checked="@(inheritor.InheritorType == InheritorType.Type1)" value="@((int)InheritorType.Type1)">@((int)InheritorType.Type1)</option>
+                <option checked="@(inheritor.InheritorType == InheritorType.Type2)" value="@((int)InheritorType.Type2)">@((int)InheritorType.Type2)</option>
+                <option checked="@(inheritor.InheritorType == InheritorType.Type3)" value="@((int)InheritorType.Type3)">@((int)InheritorType.Type3)</option>
             </InputSelect>
         </div>
         <div>

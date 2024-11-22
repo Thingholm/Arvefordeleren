@@ -5,15 +5,10 @@ public class Inheritor
     [Required]
     public int Id { get; set; }
     public string? Name {get; set;}
-    public ArveKlasse ArveKlasse {get; set;}
+    public InheritorType InheritorType {get; set;}
     
-    public Inheritor()
-    {
-        
-    }
-
 }
-public enum ArveKlasse
+public enum InheritorType
 {
     Type1 = 1,
     Type2 = 2,
