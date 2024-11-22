@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ArvefordelerenWebApp.Models;
 
-public class Asset : IModel
+public class Asset
 {
     [Required]
     public int Id { get; set; }

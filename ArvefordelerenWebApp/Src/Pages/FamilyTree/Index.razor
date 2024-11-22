@@ -5,10 +5,7 @@
 <PageTitle>Stamtræ</PageTitle>
 
 <section class="familyTreeContainer" id="familyTree">
-<<<<<<< HEAD
 
-=======
->>>>>>> main
     <Table id="tableFamilyTree">
         <TableHeader>
             <TableRow class="tableRow">
@@ -25,13 +22,12 @@
                     <TableRowCell class="align-middle">@((int)inheritor.InheritorType)</TableRowCell>
                     <TableRowCell class="col-1 align-middle">
                         <Button @onclick="() => UpdateInheritor(inheritor.Id)"><Icon Name="IconName.Pen"/></Button>
-                        <Button @onclick="() => DeleteInheritor(inheritor)"><Icon Name="IconName.Delete" style="color: #cf0000"/></Button>
+                        <Button @onclick="() => DeleteInheritor(inheritor.Id)"><Icon Name="IconName.Delete" style="color: #cf0000"/></Button>
                     </TableRowCell>
                 </TableRow>
             }
         </TableBody>
     </Table>
-<<<<<<< HEAD
     <table id="tableFamilyTree">
         <tr class="tableRow">
             <th> Navn </th>
@@ -51,8 +47,6 @@
             </tr>
         }
     </table>
-=======
->>>>>>> main
 </section>
 
 
@@ -84,7 +78,6 @@
 
 <!-- Tilføj arving -->
 
-<<<<<<< HEAD
 
 <AddInheritor @bind-Inheritors=inheritors/>
 
@@ -111,19 +104,36 @@
     </div>
 </EditForm>
 
-=======
-<AddInheritor @bind-Inheritors=inheritors/>
->>>>>>> main
 
 @code {
+
     private List<Inheritor> inheritors = InheritorRepository.GetInheritors();
 
     private Inheritor newInheritor = new Inheritor();
 
-    private void DeleteInheritor(Inheritor inheritor)
+    private int nextId => inheritors.Any() ? inheritors.Max(i => i.Id) + 1 : 0;
+
+    private void Submit()
     {
-        InheritorRepository.DeleteInheritor(inheritor);
-        inheritors = InheritorRepository.GetInheritors();
+
+        newInheritor.Id = nextId;
+
+        inheritors.Add(newInheritor);
+
+        // Ryd formen
+        newInheritor = new Inheritor();
+    }
+
+
+    private void DeleteInheritor(int inheritorId)
+    {
+        Inheritor inheritorToRemove = inheritors.FirstOrDefault(i => i.Id == inheritorId);
+        if (inheritorToRemove != null)
+        {
+            inheritors.Remove(inheritorToRemove);
+        }
+
+        StateHasChanged();
     }
 
     private void UpdateInheritor(int inheritorId) 
