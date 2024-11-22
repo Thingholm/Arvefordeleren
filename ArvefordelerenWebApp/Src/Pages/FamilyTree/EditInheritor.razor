@@ -1,94 +1,58 @@
+@page "/edit-inheritor/{InheritorId:int}"
+@inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
-<Button @onclick="() => modalRef.Show()"><Icon Name="IconName.Pen"/></Button>
+<PageTitle>Rediger arvings oplysninger</PageTitle>
 
-<Modal @ref="modalRef">
-    <ModalContent>
-        <ModalHeader>Redigér Arving <CloseButton class="me-1"/> </ModalHeader>
-        <ModalBody>
-            <Validations @ref="validationsRef" Mode="ValidationMode.Manual" Model="inheritorToEdit" ValidateOnLoad="false">
-                <Fields>
-                    <Validation Validator="ValidationRule.IsNotEmpty">
-                        <Field>
-                            <FieldLabel>Navn på arving:</FieldLabel>
-                            <FieldBody>
-                                <TextEdit @bind-Text="inheritorToEdit.Name">
-                                    <Feedback>
-                                        <ValidationError>Indtast venligst navnet på arvingen</ValidationError>
-                                    </Feedback>
-                                </TextEdit>
-                            </FieldBody>
-                        </Field>
-                    </Validation>
-                </Fields>
+<h1>Rediger oplysninger</h1>
 
-                <Fields>
-                    <Field>
-                        <FieldLabel>Arveklasse:</FieldLabel>
-                        <FieldBody>
-                            <Select TValue=InheritorType @bind-SelectedValue=inheritorToEdit.InheritorType>
-                                <SelectItem value="@(InheritorType.Type1)">1</SelectItem>
-                                <SelectItem value="@(InheritorType.Type2)">2</SelectItem>
-                                <SelectItem value="@(InheritorType.Type3)">3</SelectItem>
-                            </Select>
-                        </FieldBody>
-                    </Field>
-                </Fields>
-            </Validations>
-        </ModalBody>
-        <ModalFooter>
-            <Button Color="Color.Secondary" @onclick="() => cancelChanges()">Annullér ændringer</Button>
-            <Button Color="Color.Primary" @onclick="() => saveChanges()">Gem ændringer</Button>
-        </ModalFooter>
-    </ModalContent>
-</Modal>
-
-@code 
+@if (inheritor != null)
 {
-    [Parameter]
-    public List<Inheritor> Inheritors { get; set; } = new List<Inheritor>();
+    <EditForm Model="inheritor" OnValidSubmit="SaveInheritor"> 
+        <DataAnnotationsValidator/>
+        <div>
+            <label>Navn</label>
+            <InputText @bind-Value="inheritor.Name" />
+        </div>
+        <div>     
+            <label for="inheritorType">Arveklasse:</label>
+            <InputSelect @bind-Value="inheritor.InheritorType" class="form-control">
+                <option value="">Vælg arveklasse...</option>
+                <option checked="@(inheritor.InheritorType == InheritorType.Type1)" value="@((int)InheritorType.Type1)">@((int)InheritorType.Type1)</option>
+                <option checked="@(inheritor.InheritorType == InheritorType.Type2)" value="@((int)InheritorType.Type2)">@((int)InheritorType.Type2)</option>
+                <option checked="@(inheritor.InheritorType == InheritorType.Type3)" value="@((int)InheritorType.Type3)">@((int)InheritorType.Type3)</option>
+            </InputSelect>
+        </div>
+        <div>
+            <button type="submit">Gem</button>
+            <button @onclick="CancelEdit">Annuller</button>
+        </div>
+    </EditForm>
+}
+else 
+{
+    <p>Arving ikke fundet.</p>
+}
 
+@code {
     [Parameter]
-    public EventCallback<List<Inheritor>> InheritorsChanged { get; set; }
-    [Parameter]
-    public Inheritor Inheritor { get; set; } = new Inheritor();
-    private Inheritor inheritorToEdit = new Inheritor();
-    private Modal modalRef = new Modal();
-
-    private Validations validationsRef { get; set; } = new Validations();
-
+    public int InheritorId {get; set;}
+    private Inheritor? inheritor;
     protected override void OnInitialized()
     {
-        setInheritorToEdit();
+        inheritor = InheritorRepository.GetInheritorById(InheritorId);
     }
 
-    private void setInheritorToEdit()
+    private void SaveInheritor()
     {
-        inheritorToEdit = new Inheritor
+        if (inheritor != null)
         {
-            Id = Inheritor.Id,
-            Name = Inheritor.Name,
-            InheritorType = Inheritor.InheritorType,
-        };
-    }
-
-    private async Task saveChanges()
-    {
-        if (await validationsRef.ValidateAll())
-        {
-            InheritorRepository.UpdateInheritor(inheritorToEdit);
-            List<Inheritor> newInheritors = InheritorRepository.GetInheritors();
-            await InheritorsChanged.InvokeAsync(newInheritors);
-
-            await validationsRef.ClearAll();
-
-            await modalRef.Hide();
+            InheritorRepository.UpdateInheritor(inheritor);
+            NavigationManager.NavigateTo("/FamilyTree");
         }
     }
 
-    private void cancelChanges()
-    {
-        setInheritorToEdit();
-        modalRef.Hide();
-    }
-}
+    private void CancelEdit() {
+        
+        NavigationManager.NavigateTo("/FamilyTree");
+    }}i
