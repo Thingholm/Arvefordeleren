@@ -9,7 +9,7 @@
             <Validations @ref="validationsRef" Mode="ValidationMode.Manual" Model="newInheritor" ValidateOnLoad="false">
                 <Validation Validator="ValidationRule.IsNotEmpty">
                     <Field>
-                        <FieldLabel>Navn på aktiv</FieldLabel>
+                        <FieldLabel>Navn på arving</FieldLabel>
                         <FieldBody>
                             <TextEdit @bind-Text="newInheritor.Name">
                                 <Feedback>
@@ -24,11 +24,11 @@
                     <Field>
                         <FieldLabel>Arveklasse</FieldLabel>
                         <FieldBody>
-                            <Select TValue=ArveKlasse @bind-SelectedValue=newInheritor.ArveKlasse>
-                                <SelectItem value="@(ArveKlasse.TypeEmpty)">- Vælg venligst en arveklasse -</SelectItem>
-                                <SelectItem value="@(ArveKlasse.Type1)">@((int)ArveKlasse.Type1)</SelectItem>
-                                <SelectItem value="@(ArveKlasse.Type2)">@((int)ArveKlasse.Type2)</SelectItem>
-                                <SelectItem value="@(ArveKlasse.Type3)">@((int)ArveKlasse.Type3)</SelectItem>
+                            <Select TValue=InheritorType @bind-SelectedValue=newInheritor.InheritorType>
+                                <SelectItem value="@(InheritorType.TypeEmpty)">- Vælg venligst en arveklasse -</SelectItem>
+                                <SelectItem value="@(InheritorType.Type1)">@((int)InheritorType.Type1)</SelectItem>
+                                <SelectItem value="@(InheritorType.Type2)">@((int)InheritorType.Type2)</SelectItem>
+                                <SelectItem value="@(InheritorType.Type3)">@((int)InheritorType.Type3)</SelectItem>
                             </Select>
                         </FieldBody>
                     </Field>
@@ -71,7 +71,6 @@
 
     private void validateInheritorClassSelect(ValidatorEventArgs e)
     {
-        ArveKlasse inheritorClass = (ArveKlasse)e.Value;
-        e.Status = inheritorClass == ArveKlasse.TypeEmpty ? ValidationStatus.Error : ValidationStatus.Success;
+        e.Status = (InheritorType)e.Value == InheritorType.TypeEmpty ? ValidationStatus.Error : ValidationStatus.Success;
     }
 }
