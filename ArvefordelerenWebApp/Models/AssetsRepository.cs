@@ -10,14 +10,14 @@ public static class AssetsRepository
         {
             Id = 1,
             Name = "Kontanter",
-            Value = 10.12321312, 
+            Value = 1950000, 
             Liquid = true
         },
         new Asset
         {
             Id = 2,
             Name = "Hus",
-            Value = 2.211,
+            Value = 3500000,
             Liquid = false
         }
     };

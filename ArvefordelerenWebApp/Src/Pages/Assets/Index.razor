@@ -1,5 +1,4 @@
 @page "/aktiver"
-@inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
 <PageTitle>Aktiver</PageTitle>
@@ -20,7 +19,7 @@
         {
             <TableRow @key="asset.Id">
                 <TableRowCell class="align-middle">@asset.Name</TableRowCell>
-                <TableRowCell class="align-middle">@asset.Value</TableRowCell>
+                <TableRowCell class="align-middle">@((asset.Value ?? 0).ToString("N2"))</TableRowCell>
                 <TableRowCell class="align-middle">@(asset.Liquid ? "x" : "")</TableRowCell>
                 <TableRowCell class="col-1 align-middle">
                     <EditAsset @bind-Assets="assets" Asset="asset"/>
