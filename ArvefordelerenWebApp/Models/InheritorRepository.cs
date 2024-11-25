@@ -54,4 +54,5 @@ public static class InheritorRepository
     {
         inheritors.Remove(inheritor);
     }
+    
 }

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using ArvefordelerenWebApp.Utilities;
 
 namespace ArvefordelerenWebApp.Models;
@@ -63,5 +64,10 @@ public static class AssetsRepository
     public static void DeleteAsset(Asset asset)
     {
         assets.Remove(asset);
+    }
+
+    public static string GetAssetsAsJson()
+    {
+        return JsonSerializer.Serialize(assets, new JsonSerializerOptions {WriteIndented = true});
     }
 }
