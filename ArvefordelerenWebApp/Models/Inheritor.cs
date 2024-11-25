@@ -16,3 +16,4 @@ public enum InheritorType
     Type2 = 2,
     Type3 = 3
 }
+

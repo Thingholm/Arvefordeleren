@@ -1,4 +1,5 @@
 using ArvefordelerenWebApp.Utilities;
+using System.Text.Json;
 
 namespace ArvefordelerenWebApp.Models;
 
@@ -54,5 +55,8 @@ public static class InheritorRepository
     {
         inheritors.Remove(inheritor);
     }
-    
+    public static string GetInheritorsAsJson()
+    {
+        return JsonSerializer.Serialize(inheritors, new JsonSerializerOptions {WriteIndented = true});
+    }
 }

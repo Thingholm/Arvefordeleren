@@ -30,7 +30,6 @@
         }
     </TableBody>
 </Table>
-<button @onclick="DownloadAssetsAsPdf">DOWNLOAD!!!!!</button>
 
 <AddAsset @bind-Assets=assets/>
 
@@ -43,13 +42,4 @@
         assets = AssetsRepository.GetAssets();
     }
 
-    private async Task DownloadAssetsAsPdf()
-    {
-        var jsonContent = AssetsRepository.GetAssetsAsJson();
-        var pdfBytes = PdfService.GeneratePdfFromJson(jsonContent);
-
-        await using var stream = new MemoryStream(pdfBytes);
-        var fileName = "Assets.pdf";
-        await JSRuntime.InvokeVoidAsync("downloadFile", fileName, "application/pdf", Convert.ToBase64String(pdfBytes));
-    }
 }

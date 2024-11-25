@@ -1,4 +1,7 @@
-﻿<Bar Breakpoint="Breakpoint.Desktop">
+﻿@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+
+<Bar Breakpoint="Breakpoint.Desktop">
     <BarBrand>
         <BarLink To="/">
             Arvefordeleren
@@ -23,8 +26,20 @@
             </BarItem>
             <BarItem>
                 <Button Color="Color.Secondary">Upload</Button>
-                <Button Color="Color.Primary">Download</Button>
+                <Button  @onclick="DownloadPageAsPdf" Color="Color.Primary">Download</Button>
             </BarItem>
         </BarEnd>
     </BarMenu>
 </Bar>
+
+@code {
+    private async Task DownloadPageAsPdf()
+    {
+        var jsonContent = AssetsRepository.GetAssetsAsJson() + InheritorRepository.GetInheritorsAsJson();
+        var pdfBytes = PdfService.GeneratePdfFromJson(jsonContent);
+
+        await using var stream = new MemoryStream(pdfBytes);
+        var fileName = "Arvefordeleren.pdf";
+        await JSRuntime.InvokeVoidAsync("downloadFile", fileName, "application/pdf", Convert.ToBase64String(pdfBytes));
+    }
+}
