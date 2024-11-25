@@ -25,7 +25,9 @@
                 </BarLink>
             </BarItem>
             <BarItem>
-                <Button Color="Color.Secondary">Upload</Button>
+                <Button Color="Color.Secondary">Upload
+                    <InputFile OnChange="HandleFileUpload"></InputFile>
+                </Button>
                 <Button  @onclick="DownloadPageAsPdf" Color="Color.Primary">Download</Button>
             </BarItem>
         </BarEnd>
@@ -35,11 +37,43 @@
 @code {
     private async Task DownloadPageAsPdf()
     {
-        var jsonContent = AssetsRepository.GetAssetsAsJson() + "\n" + InheritorRepository.GetInheritorsAsJson();
+        //var jsonContent = AssetsRepository.GetAssetsAsJson() + "\n" + InheritorRepository.GetInheritorsAsJson();
+        var jsonContent = JsonSerializer.Serialize(new
+        {
+            Assets = AssetsRepository.GetAssets(),
+            Inheritors = InheritorRepository.GetInheritors()
+        }, new JsonSerializerOptions { WriteIndented = true });
         var pdfBytes = PdfService.GeneratePdfFromJson(jsonContent);
 
         await using var stream = new MemoryStream(pdfBytes);
         var fileName = "Arvefordeleren.pdf";
         await JSRuntime.InvokeVoidAsync("downloadFile", fileName, "application/pdf", Convert.ToBase64String(pdfBytes));
     }
-}
+
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file == null) return;
+
+        using var stream = new MemoryStream();
+        await file.OpenReadStream().CopyToAsync(stream);
+
+        var pdfBytes = stream.ToArray();
+        var jsonContent = PdfParsingService.ExtractJsonFromPdf(pdfBytes);
+
+        if (string.IsNullOrWhiteSpace(jsonContent))
+        {
+            Console.WriteLine("No valid JSON content extracted from PDF.");
+            return;
+        }
+
+        try
+        {
+            RepositoryUpdateService.UpdateRepositoriesFromJson(jsonContent);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating repositories: {ex.Message}");
+        }
+    }
+}    
