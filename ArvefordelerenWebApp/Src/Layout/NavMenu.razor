@@ -35,7 +35,7 @@
 @code {
     private async Task DownloadPageAsPdf()
     {
-        var jsonContent = AssetsRepository.GetAssetsAsJson() + InheritorRepository.GetInheritorsAsJson();
+        var jsonContent = AssetsRepository.GetAssetsAsJson() + "\n" + InheritorRepository.GetInheritorsAsJson();
         var pdfBytes = PdfService.GeneratePdfFromJson(jsonContent);
 
         await using var stream = new MemoryStream(pdfBytes);
