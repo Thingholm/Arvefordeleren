@@ -16,11 +16,11 @@
 
         <TableBody>
             @foreach (Inheritor inheritor in inheritors) {
-                <TableRow>
+                <TableRow @key=inheritor.Id>
                     <TableRowCell class="align-middle">@inheritor.Name</TableRowCell>
                     <TableRowCell class="align-middle">@((int)inheritor.InheritorType)</TableRowCell>
                     <TableRowCell class="col-1 align-middle">
-                        <EditInheritor @bind-Inheritors="inheritors" Inheritor="inheritor"/>
+                        <EditInheritor @bind-Inheritors="inheritors" Inheritor="inheritor" @bind-Assets=assets/>
                         <Button @onclick="() => DeleteInheritor(inheritor)"><Icon Name="IconName.Delete" style="color: #cf0000"/></Button>
                     </TableRowCell>
                 </TableRow>
@@ -29,39 +29,13 @@
     </Table>
 </section>
 
-
-<!-- Vis personligt tilknyttet arv og aktiver - modul -->
-
-<dialog id="showAssignedAssets">
-    <section>
-        <a>Navn</a>
-        <a>Arveklasse</a>
-    </section>
-    <section>
-        <ul id="listOfPersonalAssets">
-        </ul>    
-    </section>
-    <button>Tilføj aktiv</button>   
-</dialog>
-
-<!-- Tilføj aktiv til person - form -->
-
-<form hidden method="post" id="addPersonalAsset">
-
-    <a>Navn</a>
-
-    <label for="asset">Aktiv</label><br>
-    <input type="text" id="asset" name="asset"><br><br>
-
-    <button type="submit">Tilføj aktiv til person</button> 
-</form>
-
 <!-- Tilføj arving -->
 
 <AddInheritor @bind-Inheritors=inheritors/>
 
 @code {
     private List<Inheritor> inheritors = InheritorRepository.GetInheritors();
+    private List<Asset> assets = AssetsRepository.GetAssets();
 
     private Inheritor newInheritor = new Inheritor();
 
@@ -70,11 +44,4 @@
         InheritorRepository.DeleteInheritor(inheritor);
         inheritors = InheritorRepository.GetInheritors();
     }
-
-    private void UpdateInheritor(int inheritorId) 
-    {
-        NavigationManager.NavigateTo($"edit-inheritor/{inheritorId}");
-    }
 }
-
-

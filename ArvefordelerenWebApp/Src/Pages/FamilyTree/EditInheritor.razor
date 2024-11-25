@@ -36,6 +36,29 @@
                         <Check TValue=bool @bind-Checked=inheritorToEdit.InheritsFreeInheritance>Del i friarv</Check>
                     </FieldBody>
                 </Field>
+
+                <Field>
+                    <FieldBody>
+                        <Dropdown>
+                            <DropdownToggle Color="Color.Light">
+                                Udtagelsesret til aktiver
+                            </DropdownToggle>
+                            <DropdownMenu>
+                                @foreach(Asset asset in assetsToEdit)
+                                {
+                                    <DropdownItem
+                                        ShowCheckbox
+                                        Checked=@(asset.RightOfWithdrawal?.Id == inheritorToEdit.Id)
+                                        CheckedChanged="() => handleCheckedChange(asset, inheritorToEdit)"
+                                        Disabled=@(asset.RightOfWithdrawal != null && asset.RightOfWithdrawal?.Id != inheritorToEdit.Id)
+                                    >
+                                        @asset.Name @((asset.RightOfWithdrawal != null && asset.RightOfWithdrawal?.Id != inheritorToEdit.Id) ? $"({asset.RightOfWithdrawal?.Name})" : "")
+                                    </DropdownItem>
+                                }
+                            </DropdownMenu>
+                        </Dropdown>
+                    </FieldBody>
+                </Field>
             </Validations>
         </ModalBody>
         <ModalFooter>
@@ -49,19 +72,38 @@
 {
     [Parameter]
     public List<Inheritor> Inheritors { get; set; } = new List<Inheritor>();
-
     [Parameter]
     public EventCallback<List<Inheritor>> InheritorsChanged { get; set; }
+
     [Parameter]
     public Inheritor Inheritor { get; set; } = new Inheritor();
-    private Inheritor inheritorToEdit = new Inheritor();
-    private Modal modalRef = new Modal();
+    
+    [Parameter]
+    public List<Asset> Assets { get; set; } = new List<Asset>();
+    [Parameter]
+    public EventCallback<List<Asset>> AssetsChanged { get; set; }
 
+    private Inheritor inheritorToEdit = new Inheritor();
+    private List<Asset> assetsToEdit = new List<Asset>();
+
+    private Modal modalRef = new Modal();
     private Validations validationsRef { get; set; } = new Validations();
 
     protected override void OnInitialized()
     {
         setInheritorToEdit();
+        setAssetsToEdit();
+    }
+    
+    protected override void OnParametersSet()
+    {
+        setInheritorToEdit();
+        setAssetsToEdit();
+    }
+
+    protected override bool ShouldRender()
+    {
+        return false;
     }
 
     private void setInheritorToEdit()
@@ -75,6 +117,25 @@
         };
     }
 
+    private void setAssetsToEdit()
+    {
+        assetsToEdit = new List<Asset>();
+        foreach(Asset asset in Assets)
+        {
+            assetsToEdit.Add
+            (
+                new Asset
+                {
+                    Id = asset.Id,
+                    Name = asset.Name,
+                    Value = asset.Value,
+                    Liquid = asset.Liquid,
+                    RightOfWithdrawal = asset.RightOfWithdrawal
+                }
+            );
+        }
+    }
+
     private async Task saveChanges()
     {
         if (await validationsRef.ValidateAll())
@@ -82,6 +143,10 @@
             InheritorRepository.UpdateInheritor(inheritorToEdit);
             List<Inheritor> newInheritors = InheritorRepository.GetInheritors();
             await InheritorsChanged.InvokeAsync(newInheritors);
+
+            AssetsRepository.UpdateAssets(assetsToEdit);
+            List<Asset> newAssets = AssetsRepository.GetAssets();
+            await AssetsChanged.InvokeAsync(newAssets);
 
             await validationsRef.ClearAll();
 
@@ -92,6 +157,18 @@
     private void cancelChanges()
     {
         setInheritorToEdit();
+        setAssetsToEdit();
         modalRef.Hide();
+    }
+
+    private void handleCheckedChange(Asset asset, Inheritor inheritor)
+    {
+        if (asset.RightOfWithdrawal?.Id == inheritor.Id)
+        {
+            asset.RightOfWithdrawal = null;
+            return;
+        }
+
+        asset.RightOfWithdrawal = inheritor;
     }
 }
