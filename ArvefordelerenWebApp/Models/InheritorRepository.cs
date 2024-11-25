@@ -15,6 +15,7 @@ public static class InheritorRepository
     };
 
     public static List<Inheritor> GetInheritors() => inheritors.ToList();
+    public static event Action? OnChange;
 
     public static Inheritor? GetInheritorById(int id) => inheritors.FirstOrDefault(i => i.Id == id);
 
@@ -30,6 +31,7 @@ public static class InheritorRepository
             Name = name,
             InheritorType = inheritorType
         });
+        NotifyChange();
     }
     
     public static void AddInheritor(Inheritor inheritor)
@@ -39,6 +41,7 @@ public static class InheritorRepository
         inheritor.Id = inheritors.GenerateId();
         Console.WriteLine(inheritor.Id);
         inheritors.Add(inheritor);
+        NotifyChange();
     }
 
     public static void UpdateInheritor(Inheritor inheritor)
@@ -54,7 +57,9 @@ public static class InheritorRepository
     public static void DeleteInheritor(Inheritor inheritor)
     {
         inheritors.Remove(inheritor);
+        NotifyChange();
     }
+    private static void NotifyChange() => OnChange?.Invoke();
     public static string GetInheritorsAsJson()
     {
         return JsonSerializer.Serialize(inheritors, new JsonSerializerOptions {WriteIndented = true});

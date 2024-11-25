@@ -62,15 +62,28 @@
 
 @code {
     private List<Inheritor> inheritors = InheritorRepository.GetInheritors();
+    protected override void OnInitialized()
+    {
+        inheritors = InheritorRepository.GetInheritors();
+        InheritorRepository.OnChange += UpdateInheritors;
+    }
 
     private Inheritor newInheritor = new Inheritor();
+    private void UpdateInheritors()
+    {
+        inheritors = InheritorRepository.GetInheritors();
+        InvokeAsync(StateHasChanged);
+    }
 
     private void DeleteInheritor(Inheritor inheritor)
     {
         InheritorRepository.DeleteInheritor(inheritor);
         inheritors = InheritorRepository.GetInheritors();
     }
-
+    public void Dispose()
+    {
+        InheritorRepository.OnChange -= UpdateInheritors;
+    }
     private void UpdateInheritor(int inheritorId) 
     {
         NavigationManager.NavigateTo($"edit-inheritor/{inheritorId}");

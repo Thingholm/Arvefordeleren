@@ -34,11 +34,24 @@
 
 @code {
     private List<Asset> assets = AssetsRepository.GetAssets();
-    
+    protected override void OnInitialized()
+    {
+        assets = AssetsRepository.GetAssets();
+        AssetsRepository.OnChange += UpdateAssets;
+    }
+    private void UpdateAssets()
+    {
+        assets = AssetsRepository.GetAssets();
+        InvokeAsync(StateHasChanged);
+    }
     private void DeleteAsset(Asset asset)
     {
         AssetsRepository.DeleteAsset(asset);
         assets = AssetsRepository.GetAssets();
+    }
+    public void Dispose()
+    {
+        AssetsRepository.OnChange -= UpdateAssets;
     }
 
 }

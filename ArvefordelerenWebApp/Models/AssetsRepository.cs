@@ -24,6 +24,7 @@ public static class AssetsRepository
     };
 
     public static List<Asset> GetAssets() => assets.ToList();
+    public static event Action? OnChange;
 
      public static Asset? GetAssetById(int id) => assets.FirstOrDefault(a => a.Id == id);
 
@@ -39,6 +40,7 @@ public static class AssetsRepository
             Value = value,
             Liquid = liquid
         });
+        NotifyChange();
     }
     
     
@@ -48,6 +50,7 @@ public static class AssetsRepository
 
         asset.Id = assets.GenerateId();
         assets.Add(asset);
+        NotifyChange();
     }
 
     public static void UpdateAsset(Asset asset)
@@ -64,7 +67,9 @@ public static class AssetsRepository
     public static void DeleteAsset(Asset asset)
     {
         assets.Remove(asset);
+        NotifyChange();
     }
+    private static void NotifyChange() => OnChange?.Invoke();
 
     public static string GetAssetsAsJson()
     {
