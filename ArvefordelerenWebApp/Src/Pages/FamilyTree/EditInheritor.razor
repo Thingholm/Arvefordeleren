@@ -7,33 +7,35 @@
         <ModalHeader>Redigér Arving <CloseButton class="me-1"/> </ModalHeader>
         <ModalBody>
             <Validations @ref="validationsRef" Mode="ValidationMode.Manual" Model="inheritorToEdit" ValidateOnLoad="false">
-                <Fields>
-                    <Validation Validator="ValidationRule.IsNotEmpty">
-                        <Field>
-                            <FieldLabel>Navn på arving:</FieldLabel>
-                            <FieldBody>
-                                <TextEdit @bind-Text="inheritorToEdit.Name">
-                                    <Feedback>
-                                        <ValidationError>Indtast venligst navnet på arvingen</ValidationError>
-                                    </Feedback>
-                                </TextEdit>
-                            </FieldBody>
-                        </Field>
-                    </Validation>
-                </Fields>
-
-                <Fields>
+                <Validation Validator="ValidationRule.IsNotEmpty">
                     <Field>
-                        <FieldLabel>Arveklasse:</FieldLabel>
+                        <FieldLabel>Navn på arving:</FieldLabel>
                         <FieldBody>
-                            <Select TValue=InheritorType @bind-SelectedValue=inheritorToEdit.InheritorType>
-                                <SelectItem value="@(InheritorType.Type1)">1</SelectItem>
-                                <SelectItem value="@(InheritorType.Type2)">2</SelectItem>
-                                <SelectItem value="@(InheritorType.Type3)">3</SelectItem>
-                            </Select>
+                            <TextEdit @bind-Text="inheritorToEdit.Name">
+                                <Feedback>
+                                    <ValidationError>Indtast venligst navnet på arvingen</ValidationError>
+                                </Feedback>
+                            </TextEdit>
                         </FieldBody>
                     </Field>
-                </Fields>
+                </Validation>
+
+                <Field>
+                    <FieldLabel>Arveklasse:</FieldLabel>
+                    <FieldBody>
+                        <Select TValue=InheritorType @bind-SelectedValue=inheritorToEdit.InheritorType>
+                            <SelectItem value="@(InheritorType.Type1)">1</SelectItem>
+                            <SelectItem value="@(InheritorType.Type2)">2</SelectItem>
+                            <SelectItem value="@(InheritorType.Type3)">3</SelectItem>
+                        </Select>
+                    </FieldBody>
+                </Field>
+
+                <Field>
+                    <FieldBody>
+                        <Check TValue=bool @bind-Checked=inheritorToEdit.InheritsFreeInheritance>Del i friarv</Check>
+                    </FieldBody>
+                </Field>
             </Validations>
         </ModalBody>
         <ModalFooter>
@@ -69,6 +71,7 @@
             Id = Inheritor.Id,
             Name = Inheritor.Name,
             InheritorType = Inheritor.InheritorType,
+            InheritsFreeInheritance = Inheritor.InheritsFreeInheritance
         };
     }
 
