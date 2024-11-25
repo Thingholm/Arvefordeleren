@@ -10,4 +10,5 @@ public class Asset : IModel
     public string Name { get; set; } = null!;
     public double? Value { get; set; }
     public bool Liquid { get; set; }
+    public Inheritor? RightOfWithdrawal { get; set; }
 }

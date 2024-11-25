@@ -52,6 +52,21 @@ public static class InheritorRepository
 
     public static void DeleteInheritor(Inheritor inheritor)
     {
+        List<Asset> assets = AssetsRepository
+            .GetAssetsByRightOfWithdrawal(inheritor)
+            .Select(asset => 
+                new Asset
+                { 
+                    Id = asset.Id,
+                    Name = asset.Name,
+                    Value = asset.Value,
+                    Liquid = asset.Liquid
+                }
+            )
+            .ToList();
+
+        AssetsRepository.UpdateAssets(assets);        
+
         inheritors.Remove(inheritor);
     }
 }

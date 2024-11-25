@@ -5,6 +5,7 @@ public class Inheritor : IModel
     [Required]
     public int Id { get; set; }
     public string? Name {get; set;}
+    public bool InheritsFreeInheritance { get; set; }
     public InheritorType InheritorType {get; set;}
     
 }
