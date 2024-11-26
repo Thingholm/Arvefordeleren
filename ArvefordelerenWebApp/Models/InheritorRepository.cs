@@ -36,7 +36,6 @@ public static class InheritorRepository
         if (inheritor == null || string.IsNullOrWhiteSpace(inheritor.Name)) return;
 
         inheritor.Id = inheritors.GenerateId();
-        Console.WriteLine(inheritor.Id);
         inheritors.Add(inheritor);
     }
 
@@ -48,10 +47,26 @@ public static class InheritorRepository
 
         existingInheritor.Name = inheritor.Name;
         existingInheritor.InheritorType = inheritor.InheritorType;
+        existingInheritor.InheritsFreeInheritance = inheritor.InheritsFreeInheritance;
     }
 
     public static void DeleteInheritor(Inheritor inheritor)
     {
+        List<Asset> assets = AssetsRepository
+            .GetAssetsByRightOfWithdrawal(inheritor)
+            .Select(asset => 
+                new Asset
+                { 
+                    Id = asset.Id,
+                    Name = asset.Name,
+                    Value = asset.Value,
+                    Liquid = asset.Liquid
+                }
+            )
+            .ToList();
+
+        AssetsRepository.UpdateAssets(assets);        
+
         inheritors.Remove(inheritor);
     }
 }

@@ -10,17 +10,34 @@
             <TableRow class="tableRow">
                 <TableHeaderCell>Navn</TableHeaderCell>
                 <TableHeaderCell>Arveklasse</TableHeaderCell>
+                <TableHeaderCell>Del af friarv</TableHeaderCell>
+                <TableHeaderCell>Udtagelsesret til aktiver</TableHeaderCell>
                 <TableHeaderCell></TableHeaderCell>
             </TableRow>
         </TableHeader>
 
         <TableBody>
-            @foreach (Inheritor inheritor in inheritors) {
-                <TableRow>
+            @foreach (Inheritor inheritor in inheritors) 
+            {
+                <TableRow @key=inheritor.Id>
                     <TableRowCell class="align-middle">@inheritor.Name</TableRowCell>
                     <TableRowCell class="align-middle">@((int)inheritor.InheritorType)</TableRowCell>
+                    <TableRowCell class="align-middle"><Icon Name="IconName.Check" hidden=@(!inheritor.InheritsFreeInheritance)/></TableRowCell>
+                    <TableRowCell class="align-middle">
+                        @for (int i = 0; i < AssetsRepository.GetAssetsByRightOfWithdrawal(inheritor).Count(); i++)
+                        {
+                            if (i == 0)
+                            {
+                                <span>@AssetsRepository.GetAssetsByRightOfWithdrawal(inheritor)[0].Name.ToString()</span>;
+                            }
+                            else
+                            {
+                                <span>, @AssetsRepository.GetAssetsByRightOfWithdrawal(inheritor)[i].Name.ToString()</span>;
+                            }
+                        }
+                    </TableRowCell>
                     <TableRowCell class="col-1 align-middle">
-                        <EditInheritor @bind-Inheritors="inheritors" Inheritor="inheritor"/>
+                        <EditInheritor @bind-Inheritors="inheritors" Inheritor="inheritor" @bind-Assets=assets/>
                         <Button @onclick="() => DeleteInheritor(inheritor)"><Icon Name="IconName.Delete" style="color: #cf0000"/></Button>
                     </TableRowCell>
                 </TableRow>
@@ -29,39 +46,14 @@
     </Table>
 </section>
 
-
-<!-- Vis personligt tilknyttet arv og aktiver - modul -->
-
-<dialog id="showAssignedAssets">
-    <section>
-        <a>Navn</a>
-        <a>Arveklasse</a>
-    </section>
-    <section>
-        <ul id="listOfPersonalAssets">
-        </ul>    
-    </section>
-    <button>Tilføj aktiv</button>   
-</dialog>
-
-<!-- Tilføj aktiv til person - form -->
-
-<form hidden method="post" id="addPersonalAsset">
-
-    <a>Navn</a>
-
-    <label for="asset">Aktiv</label><br>
-    <input type="text" id="asset" name="asset"><br><br>
-
-    <button type="submit">Tilføj aktiv til person</button> 
-</form>
-
 <!-- Tilføj arving -->
 
-<AddInheritor @bind-Inheritors=inheritors/>
+<AddInheritor @bind-Inheritors=inheritors @bind-Assets=assets/>
+
 
 @code {
     private List<Inheritor> inheritors = InheritorRepository.GetInheritors();
+    private List<Asset> assets = AssetsRepository.GetAssets();
 
     private Inheritor newInheritor = new Inheritor();
 
@@ -70,11 +62,4 @@
         InheritorRepository.DeleteInheritor(inheritor);
         inheritors = InheritorRepository.GetInheritors();
     }
-
-    private void UpdateInheritor(int inheritorId) 
-    {
-        NavigationManager.NavigateTo($"edit-inheritor/{inheritorId}");
-    }
 }
-
-

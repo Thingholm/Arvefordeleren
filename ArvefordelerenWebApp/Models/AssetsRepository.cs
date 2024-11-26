@@ -24,9 +24,14 @@ public static class AssetsRepository
 
     public static List<Asset> GetAssets() => assets.ToList();
 
-     public static Asset? GetAssetById(int id) => assets.FirstOrDefault(a => a.Id == id);
+    public static Asset? GetAssetById(int id) => assets.FirstOrDefault(a => a.Id == id);
 
-    public static void AddAsset(string name, double? value, bool liquid)
+    public static List<Asset> GetAssetsByRightOfWithdrawal(Inheritor inheritor)
+    {
+        return assets.Where(asset => asset.RightOfWithdrawal?.Id == inheritor.Id).ToList();
+    }
+
+    public static void AddAsset(string name, double? value, bool liquid, Inheritor? rightOfWithdrawal)
     {
         if (string.IsNullOrWhiteSpace(name)) return;
 
@@ -36,7 +41,8 @@ public static class AssetsRepository
             Id = id,
             Name = name,
             Value = value,
-            Liquid = liquid
+            Liquid = liquid,
+            RightOfWithdrawal = rightOfWithdrawal
         });
     }
     
@@ -58,6 +64,15 @@ public static class AssetsRepository
         existingAsset.Name = asset.Name;
         existingAsset.Value = asset.Value;
         existingAsset.Liquid = asset.Liquid;
+        existingAsset.RightOfWithdrawal = asset.RightOfWithdrawal;
+    }
+
+    public static void UpdateAssets(List<Asset> assetsToUpdate)
+    {
+        foreach(Asset asset in assetsToUpdate)
+        {
+            UpdateAsset(asset);
+        }
     }
 
     public static void DeleteAsset(Asset asset)

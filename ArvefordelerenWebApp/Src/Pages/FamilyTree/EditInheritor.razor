@@ -1,39 +1,64 @@
 @rendermode InteractiveServer
 
-<Button @onclick="() => modalRef.Show()"><Icon Name="IconName.Pen"/></Button>
+<Button @onclick="() => onOpen()"><Icon Name="IconName.Pen"/></Button>
 
 <Modal @ref="modalRef">
     <ModalContent>
         <ModalHeader>Redigér Arving <CloseButton class="me-1"/> </ModalHeader>
         <ModalBody>
             <Validations @ref="validationsRef" Mode="ValidationMode.Manual" Model="inheritorToEdit" ValidateOnLoad="false">
-                <Fields>
-                    <Validation Validator="ValidationRule.IsNotEmpty">
-                        <Field>
-                            <FieldLabel>Navn på arving:</FieldLabel>
-                            <FieldBody>
-                                <TextEdit @bind-Text="inheritorToEdit.Name">
-                                    <Feedback>
-                                        <ValidationError>Indtast venligst navnet på arvingen</ValidationError>
-                                    </Feedback>
-                                </TextEdit>
-                            </FieldBody>
-                        </Field>
-                    </Validation>
-                </Fields>
-
-                <Fields>
+                <Validation Validator="ValidationRule.IsNotEmpty">
                     <Field>
-                        <FieldLabel>Arveklasse:</FieldLabel>
+                        <FieldLabel>Navn på arving:</FieldLabel>
                         <FieldBody>
-                            <Select TValue=InheritorType @bind-SelectedValue=inheritorToEdit.InheritorType>
-                                <SelectItem value="@(InheritorType.Type1)">1</SelectItem>
-                                <SelectItem value="@(InheritorType.Type2)">2</SelectItem>
-                                <SelectItem value="@(InheritorType.Type3)">3</SelectItem>
-                            </Select>
+                            <TextEdit @bind-Text="inheritorToEdit.Name">
+                                <Feedback>
+                                    <ValidationError>Indtast venligst navnet på arvingen</ValidationError>
+                                </Feedback>
+                            </TextEdit>
                         </FieldBody>
                     </Field>
-                </Fields>
+                </Validation>
+
+                <Field>
+                    <FieldLabel>Arveklasse:</FieldLabel>
+                    <FieldBody>
+                        <Select TValue=InheritorType @bind-SelectedValue=inheritorToEdit.InheritorType>
+                            <SelectItem value="@(InheritorType.Type1)">1</SelectItem>
+                            <SelectItem value="@(InheritorType.Type2)">2</SelectItem>
+                            <SelectItem value="@(InheritorType.Type3)">3</SelectItem>
+                        </Select>
+                    </FieldBody>
+                </Field>
+
+                <Field>
+                    <FieldBody>
+                        <Check TValue=bool @bind-Checked=inheritorToEdit.InheritsFreeInheritance>Del i friarv</Check>
+                    </FieldBody>
+                </Field>
+
+                <Field>
+                    <FieldBody>
+                        <Dropdown>
+                            <DropdownToggle Color="Color.Light">
+                                Udtagelsesret til aktiver
+                            </DropdownToggle>
+                            <DropdownMenu>
+                                @foreach(Asset asset in assetsToEdit.Where(asset => !asset.Liquid))
+                                {
+                                    <DropdownItem
+                                        ShowCheckbox
+                                        Checked=@(asset.RightOfWithdrawal?.Id == inheritorToEdit.Id)
+                                        CheckedChanged="() => handleCheckedChange(asset, inheritorToEdit)"
+                                        Disabled=@(asset.RightOfWithdrawal != null && asset.RightOfWithdrawal?.Id != inheritorToEdit.Id)
+                                    >
+                                        @asset.Name @((asset.RightOfWithdrawal != null && asset.RightOfWithdrawal?.Id != inheritorToEdit.Id) ? $"({asset.RightOfWithdrawal?.Name})" : "")
+                                    </DropdownItem>
+                                }
+                            </DropdownMenu>
+                        </Dropdown>
+                    </FieldBody>
+                </Field>
             </Validations>
         </ModalBody>
         <ModalFooter>
@@ -47,19 +72,28 @@
 {
     [Parameter]
     public List<Inheritor> Inheritors { get; set; } = new List<Inheritor>();
-
     [Parameter]
     public EventCallback<List<Inheritor>> InheritorsChanged { get; set; }
+
     [Parameter]
     public Inheritor Inheritor { get; set; } = new Inheritor();
-    private Inheritor inheritorToEdit = new Inheritor();
-    private Modal modalRef = new Modal();
+    
+    [Parameter]
+    public List<Asset> Assets { get; set; } = new List<Asset>();
+    [Parameter]
+    public EventCallback<List<Asset>> AssetsChanged { get; set; }
 
+    private Inheritor inheritorToEdit = new Inheritor();
+    private List<Asset> assetsToEdit = new List<Asset>();
+
+    private Modal modalRef = new Modal();
     private Validations validationsRef { get; set; } = new Validations();
 
-    protected override void OnInitialized()
+    private void onOpen()
     {
         setInheritorToEdit();
+        setAssetsToEdit();
+        modalRef.Show();
     }
 
     private void setInheritorToEdit()
@@ -69,7 +103,27 @@
             Id = Inheritor.Id,
             Name = Inheritor.Name,
             InheritorType = Inheritor.InheritorType,
+            InheritsFreeInheritance = Inheritor.InheritsFreeInheritance
         };
+    }
+
+    private void setAssetsToEdit()
+    {
+        assetsToEdit = new List<Asset>();
+        foreach(Asset asset in Assets)
+        {
+            assetsToEdit.Add
+            (
+                new Asset
+                {
+                    Id = asset.Id,
+                    Name = asset.Name,
+                    Value = asset.Value,
+                    Liquid = asset.Liquid,
+                    RightOfWithdrawal = asset.RightOfWithdrawal
+                }
+            );
+        }
     }
 
     private async Task saveChanges()
@@ -80,6 +134,10 @@
             List<Inheritor> newInheritors = InheritorRepository.GetInheritors();
             await InheritorsChanged.InvokeAsync(newInheritors);
 
+            AssetsRepository.UpdateAssets(assetsToEdit);
+            List<Asset> newAssets = AssetsRepository.GetAssets();
+            await AssetsChanged.InvokeAsync(newAssets);
+
             await validationsRef.ClearAll();
 
             await modalRef.Hide();
@@ -89,6 +147,18 @@
     private void cancelChanges()
     {
         setInheritorToEdit();
+        setAssetsToEdit();
         modalRef.Hide();
+    }
+
+    private void handleCheckedChange(Asset asset, Inheritor inheritor)
+    {
+        if (asset.RightOfWithdrawal?.Id == inheritor.Id)
+        {
+            asset.RightOfWithdrawal = null;
+            return;
+        }
+
+        asset.RightOfWithdrawal = inheritor;
     }
 }
