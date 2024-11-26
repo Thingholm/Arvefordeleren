@@ -8,10 +8,10 @@ public static class PdfParsingService
 {
     public static string ExtractJsonFromPdf(byte[] pdfBytes)
     {
-        using var pdfReader = new PdfReader(new MemoryStream(pdfBytes));
-        using var pdfDocument = new PdfDocument(pdfReader);
+        using PdfReader pdfReader = new PdfReader(new MemoryStream(pdfBytes));
+        using PdfDocument pdfDocument = new PdfDocument(pdfReader);
 
-        var content = new StringBuilder();
+        StringBuilder content = new StringBuilder();
 
         for (int i = 1; i <= pdfDocument.GetNumberOfPages(); i++)
         {
