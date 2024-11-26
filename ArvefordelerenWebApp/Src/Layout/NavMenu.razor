@@ -37,7 +37,6 @@
 @code {
     private async Task DownloadPageAsPdf()
     {
-        //var jsonContent = AssetsRepository.GetAssetsAsJson() + "\n" + InheritorRepository.GetInheritorsAsJson();
         var jsonContent = JsonSerializer.Serialize(new
         {
             Assets = AssetsRepository.GetAssets(),
@@ -45,8 +44,8 @@
         }, new JsonSerializerOptions { WriteIndented = true });
         var pdfBytes = PdfService.GeneratePdfFromJson(jsonContent);
 
-        await using var stream = new MemoryStream(pdfBytes);
-        var fileName = "Arvefordeleren.pdf";
+        await using MemoryStream stream = new MemoryStream(pdfBytes);
+        string fileName = "Arvefordeleren.pdf";
         await JSRuntime.InvokeVoidAsync("downloadFile", fileName, "application/pdf", Convert.ToBase64String(pdfBytes));
     }
 
@@ -55,7 +54,7 @@
         var file = e.File;
         if (file == null) return;
 
-        using var stream = new MemoryStream();
+        using MemoryStream stream = new MemoryStream();
         await file.OpenReadStream().CopyToAsync(stream);
 
         var pdfBytes = stream.ToArray();
