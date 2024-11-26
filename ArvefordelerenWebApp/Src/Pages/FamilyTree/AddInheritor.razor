@@ -57,9 +57,9 @@
     {
         if (await validationsRef.ValidateAll())
         {
-            Inheritors.Add(newInheritor);
-
-            await InheritorsChanged.InvokeAsync(Inheritors);
+            InheritorRepository.AddInheritor(newInheritor);
+            List<Inheritor> newInheritors = InheritorRepository.GetInheritors();
+            await InheritorsChanged.InvokeAsync(newInheritors);
 
             newInheritor = new Inheritor();
 
