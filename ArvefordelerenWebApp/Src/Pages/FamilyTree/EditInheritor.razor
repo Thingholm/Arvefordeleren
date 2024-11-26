@@ -1,6 +1,6 @@
 @rendermode InteractiveServer
 
-<Button @onclick="() => modalRef.Show()"><Icon Name="IconName.Pen"/></Button>
+<Button @onclick="() => onOpen()"><Icon Name="IconName.Pen"/></Button>
 
 <Modal @ref="modalRef">
     <ModalContent>
@@ -44,7 +44,7 @@
                                 Udtagelsesret til aktiver
                             </DropdownToggle>
                             <DropdownMenu>
-                                @foreach(Asset asset in assetsToEdit)
+                                @foreach(Asset asset in assetsToEdit.Where(asset => !asset.Liquid))
                                 {
                                     <DropdownItem
                                         ShowCheckbox
@@ -89,21 +89,11 @@
     private Modal modalRef = new Modal();
     private Validations validationsRef { get; set; } = new Validations();
 
-    protected override void OnInitialized()
+    private void onOpen()
     {
         setInheritorToEdit();
         setAssetsToEdit();
-    }
-    
-    protected override void OnParametersSet()
-    {
-        setInheritorToEdit();
-        setAssetsToEdit();
-    }
-
-    protected override bool ShouldRender()
-    {
-        return false;
+        modalRef.Show();
     }
 
     private void setInheritorToEdit()

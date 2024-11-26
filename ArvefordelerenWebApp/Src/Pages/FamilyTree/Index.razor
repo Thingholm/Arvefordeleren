@@ -10,15 +10,32 @@
             <TableRow class="tableRow">
                 <TableHeaderCell>Navn</TableHeaderCell>
                 <TableHeaderCell>Arveklasse</TableHeaderCell>
+                <TableHeaderCell>Del af friarv</TableHeaderCell>
+                <TableHeaderCell>Udtagelsesret til aktiver</TableHeaderCell>
                 <TableHeaderCell></TableHeaderCell>
             </TableRow>
         </TableHeader>
 
         <TableBody>
-            @foreach (Inheritor inheritor in inheritors) {
+            @foreach (Inheritor inheritor in inheritors) 
+            {
                 <TableRow @key=inheritor.Id>
                     <TableRowCell class="align-middle">@inheritor.Name</TableRowCell>
                     <TableRowCell class="align-middle">@((int)inheritor.InheritorType)</TableRowCell>
+                    <TableRowCell class="align-middle"><Icon Name="IconName.Check" hidden=@(!inheritor.InheritsFreeInheritance)/></TableRowCell>
+                    <TableRowCell class="align-middle">
+                        @for (int i = 0; i < AssetsRepository.GetAssetsByRightOfWithdrawal(inheritor).Count(); i++)
+                        {
+                            if (i == 0)
+                            {
+                                <span>@AssetsRepository.GetAssetsByRightOfWithdrawal(inheritor)[0].Name.ToString()</span>;
+                            }
+                            else
+                            {
+                                <span>, @AssetsRepository.GetAssetsByRightOfWithdrawal(inheritor)[i].Name.ToString()</span>;
+                            }
+                        }
+                    </TableRowCell>
                     <TableRowCell class="col-1 align-middle">
                         <EditInheritor @bind-Inheritors="inheritors" Inheritor="inheritor" @bind-Assets=assets/>
                         <Button @onclick="() => DeleteInheritor(inheritor)"><Icon Name="IconName.Delete" style="color: #cf0000"/></Button>

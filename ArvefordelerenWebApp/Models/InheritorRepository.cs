@@ -36,7 +36,6 @@ public static class InheritorRepository
         if (inheritor == null || string.IsNullOrWhiteSpace(inheritor.Name)) return;
 
         inheritor.Id = inheritors.GenerateId();
-        Console.WriteLine(inheritor.Id);
         inheritors.Add(inheritor);
     }
 
