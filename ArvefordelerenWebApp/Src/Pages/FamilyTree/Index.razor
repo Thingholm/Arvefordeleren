@@ -48,7 +48,8 @@
 
 <!-- Tilføj arving -->
 
-<AddInheritor @bind-Inheritors=inheritors/>
+<AddInheritor @bind-Inheritors=inheritors @bind-Assets=assets/>
+
 
 @code {
     private List<Inheritor> inheritors = InheritorRepository.GetInheritors();

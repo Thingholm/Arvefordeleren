@@ -34,6 +34,36 @@
                     </Field>
                 </Validation>
             </Validations>
+
+            <Field>
+                <FieldBody>
+                    <Check TValue="bool" @bind-Checked="newInheritor.InheritsFreeInheritance">Del i friarv</Check>
+                </FieldBody>
+            </Field>
+            
+            <Field>
+                <FieldBody>
+                    <Dropdown>
+                        <DropdownToggle Color="Color.Light">
+                            Udtagelsesret til aktiver
+                        </DropdownToggle>
+                        <DropdownMenu>
+                            @foreach(Asset asset in Assets.Where(asset => !asset.Liquid))
+                            {
+                                <DropdownItem
+                                        ShowCheckbox
+                                        Checked=@(asset.RightOfWithdrawal?.Id == newInheritor.Id)
+                                        CheckedChanged="() => handleCheckedChange(asset, newInheritor)"
+                                        Disabled=@(asset.RightOfWithdrawal != null && asset.RightOfWithdrawal?.Id != newInheritor.Id)
+                                    >
+                                        @asset.Name @((asset.RightOfWithdrawal != null && asset.RightOfWithdrawal?.Id != newInheritor.Id) ? $"({asset.RightOfWithdrawal?.Name})" : "")
+                                    </DropdownItem>
+                            }
+                        
+                        </DropdownMenu>
+                    </Dropdown>
+                </FieldBody>
+            </Field>
         </ModalBody>
         <ModalFooter>
             <Button Color="Color.Primary" @onclick="addInheritor">Tilføj</Button>
@@ -47,11 +77,19 @@
     public List<Inheritor> Inheritors { get; set; } = new List<Inheritor>();
     [Parameter]
     public EventCallback<List<Inheritor>> InheritorsChanged { get; set; }
+    [Parameter]
+    public Inheritor newInheritor { get; set;} = new Inheritor();
+    
+    [Parameter]
+    public List<Asset> Assets { get; set; } = new List<Asset>();
+    
+    [Parameter]
+    public EventCallback<List<Asset>> AssetsChanged { get; set; }
 
     private Modal modalRef = new Modal();
     private Validations validationsRef { get; set; } = new Validations();
 
-    private Inheritor newInheritor = new Inheritor();
+   
 
     private async Task addInheritor()
     {
@@ -72,5 +110,16 @@
     private void validateInheritorClassSelect(ValidatorEventArgs e)
     {
         e.Status = (InheritorType)e.Value == InheritorType.TypeEmpty ? ValidationStatus.Error : ValidationStatus.Success;
+    }
+
+    private void handleCheckedChange(Asset asset, Inheritor inheritor)
+    {
+        if (asset.RightOfWithdrawal?.Id == inheritor.Id)
+        {
+            asset.RightOfWithdrawal = null;
+            return;
+        }
+
+        asset.RightOfWithdrawal = inheritor;
     }
 }
