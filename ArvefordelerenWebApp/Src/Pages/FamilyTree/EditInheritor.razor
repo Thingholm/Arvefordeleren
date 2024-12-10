@@ -32,10 +32,25 @@
                 </Field>
 
                 <Field>
-                    <FieldBody>
-                        <Check TValue=bool @bind-Checked=inheritorToEdit.InheritsFreeInheritance>Del i friarv</Check>
-                    </FieldBody>
-                </Field>
+                <FieldBody>
+                    <Check TValue="bool" @bind-Checked="inheritorToEdit.InheritsFreeInheritance">
+                        Del i friarv
+                    </Check>
+                    @if (inheritorToEdit.InheritsFreeInheritance)
+                    {
+                        <NumericEdit TValue="decimal?" @bind-Value="inheritorToEdit.FreeInheritancePercentage">
+                            <Feedback>
+                                <ValidationError>Indtast venligst en gyldig procentdel</ValidationError>
+                            </Feedback>
+                        </NumericEdit>
+                        
+                        @if (!string.IsNullOrEmpty(validationErrorMessage))
+                        {
+                            <div class="text-danger">@validationErrorMessage</div>
+                        }
+                    }
+                </FieldBody>
+            </Field>
 
                 <Field>
                     <FieldBody>
@@ -70,6 +85,7 @@
 
 @code 
 {
+    private string? validationErrorMessage;
     [Parameter]
     public List<Inheritor> Inheritors { get; set; } = new List<Inheritor>();
     [Parameter]
@@ -103,7 +119,8 @@
             Id = Inheritor.Id,
             Name = Inheritor.Name,
             InheritorType = Inheritor.InheritorType,
-            InheritsFreeInheritance = Inheritor.InheritsFreeInheritance
+            InheritsFreeInheritance = Inheritor.InheritsFreeInheritance,
+            FreeInheritancePercentage = Inheritor.FreeInheritancePercentage
         };
     }
 
@@ -128,6 +145,12 @@
 
     private async Task saveChanges()
     {
+        validationErrorMessage = ValidateInheritancePercentage();
+        if (validationErrorMessage != null)
+        {
+            return;
+        }
+
         if (await validationsRef.ValidateAll())
         {
             InheritorRepository.UpdateInheritor(inheritorToEdit);
@@ -160,5 +183,19 @@
         }
 
         asset.RightOfWithdrawal = inheritor;
+    }
+
+    private string? ValidateInheritancePercentage()
+    {
+        decimal totalPercentage = Inheritors
+            .Where(i => i.InheritsFreeInheritance && i.FreeInheritancePercentage.HasValue)
+            .Sum(i => i.FreeInheritancePercentage.GetValueOrDefault());
+
+        if (inheritorToEdit.FreeInheritancePercentage.HasValue)
+        {
+            totalPercentage += inheritorToEdit.FreeInheritancePercentage.Value;
+        }
+
+        return totalPercentage > 100 ? $"Den samlede procentdel må ikke overstige 100%, lige nu er {totalPercentage}% brugt" : null;
     }
 }

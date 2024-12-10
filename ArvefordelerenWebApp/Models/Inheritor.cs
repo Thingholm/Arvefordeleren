@@ -7,7 +7,7 @@ public class Inheritor : IModel
     public string? Name {get; set;}
     public bool InheritsFreeInheritance { get; set; }
     public InheritorType InheritorType {get; set;}
-    
+    public decimal? FreeInheritancePercentage {get; set;}
 }
 public enum InheritorType
 {
