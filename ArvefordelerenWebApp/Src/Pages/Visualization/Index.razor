@@ -3,25 +3,23 @@
 
 <PageTitle>Fordeling af arv</PageTitle>
 
-<div>
-    <ul>
-        @foreach(Inheritor inheritor in inheritors)
+<div class="col-12 d-flex flex-column align-items-center">
+     <div class="col-8 d-inline-flex justify-content-around mb-4">
+        @foreach(var inheritor in inheritors.Select((value, index) => new { value, index }))
         {
-            <li>
                 <Check 
                     TValue="bool" 
-                    Checked="@(removedInheritors.Any(i => i.Id == inheritor.Id))"
-                    CheckedChanged="() => handleInheritorCheck(inheritor)"
+                    Checked="@(!removedInheritors.Any(i => i.Id == inheritor.value.Id))"
+                    CheckedChanged="() => handleInheritorCheck(inheritor.value)"
                 >
-                    @inheritor.Name: 
-                    @(calculateForcedInheritance(inheritor) + calculateFreeInheritance(inheritor))
+                    @inheritor.value.Name: 
+                    @(Math.Round((calculateForcedInheritance(inheritor.value) + calculateFreeInheritance(inheritor.value)) * 100) / 100)%
+                    <div style="display: block; height: 6px; width: 100%; border-radius: 2px; background-color: @(backgroundColors[inheritor.index].ToString())"></div>
                 </Check>
-            </li>
         }
-    </ul>
-
+    </div>
     <div class="col-6">
-    <Chart Type="ChartType.Pie" @ref=pieChart TItem="double"/>
+        <Chart Type="ChartType.Pie" @ref=pieChart TItem="double" Options="chartOptions"/>
     </div>
 </div>
 
@@ -32,7 +30,6 @@
     {
         new Inheritor{Id = 2, Name = "Gustav", InheritorType = InheritorType.Type1}
     };
-    private int numberOfFreeInheritors = InheritorRepository.GetInheritors().Sum(i => i.InheritsFreeInheritance ? 1 : 0);
 
     private int fullInheritance = 100;
 
@@ -46,7 +43,16 @@
         ChartColor.FromRgba(185, 70, 255, 0.8f),
         ChartColor.FromRgba(255, 140, 50, 0.8f)
     };
-    ChartOptions chartOptions = new() { AspectRatio = 1.5 };
+    ChartOptions chartOptions = new ChartOptions() 
+    { 
+        Plugins = new ChartPlugins()
+        {
+            Legend = new ChartLegend()
+            {
+                Display = false
+            }
+        }
+    };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -80,6 +86,8 @@
 
     private double calculateForcedInheritance(Inheritor inheritor) 
     {
+        if (removedInheritors.Any(ri => ri.Id == inheritor.Id)) return 0;
+
         double forcedInheritance = fullInheritance / 4;
         List<Inheritor> inheritorsWithInheritanceClassOne = inheritors.Where(i => i.InheritorType == InheritorType.Type1 && !removedInheritors.Any(ri => ri.Id == i.Id)).ToList();
         List<Inheritor> inheritorsWithInheritanceClassTwo = inheritors.Where(i => i.InheritorType == InheritorType.Type2 && !removedInheritors.Any(ri => ri.Id == i.Id)).ToList();
@@ -97,24 +105,22 @@
         {
             return forcedInheritance / inheritorsWithInheritanceClassThree.Count;
         } 
-        else 
-        {
-            return 0;
-        }
+
+        return 0;
     }
 
     private double calculateFreeInheritance(Inheritor inheritor)
     {
+        int numberOfFreeInheritors = InheritorRepository.GetInheritors().Where(i => !removedInheritors.Any(ri => ri.Id == i.Id)).Sum(i => i.InheritsFreeInheritance ? 1 : 0);
+        
         double freeInheritance = fullInheritance * 3 / 4;
 
-        if (inheritor.InheritsFreeInheritance)
+        if (inheritor.InheritsFreeInheritance && !removedInheritors.Any(ri => ri.Id == inheritor.Id))
         {
             return freeInheritance / numberOfFreeInheritors;
         }
-        else
-        {
-            return 0;
-        }
+
+        return 0;
     }
 
     private PieChartDataset<double> getPieChartDataset()
@@ -122,7 +128,7 @@
         return new PieChartDataset<double>
         {
             Label = "Fordeling af arv",
-            Data = inheritors.Where(i => !removedInheritors.Any(ri => ri.Id == i.Id))
+            Data = inheritors
                 .Select(i => calculateForcedInheritance(i) + calculateFreeInheritance(i))
                 .ToList(),
             BackgroundColor = backgroundColors
@@ -131,7 +137,7 @@
 
     private List<string> getPieChartLabels()
     {
-        return inheritors.Where(i => !removedInheritors.Any(ri => ri.Id == i.Id))
+        return inheritors
             .Select(i => i.Name ?? "")
             .ToList();
     }
