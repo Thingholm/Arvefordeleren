@@ -3,31 +3,58 @@ using ArvefordelerenWebApp.Models;
 
 namespace ArvefordelerenWebApp.Services;
 
-public static class RepositoryUpdateService
+public class RepositoryUpdateService
 {
-    public static void UpdateRepositoriesFromJson(string jsonContent)
+    private readonly IAssetsRepository _assetsRepository;
+    private readonly IInheritorRepository _inheritorRepository;
+
+    public RepositoryUpdateService(IAssetsRepository assetsRepository, IInheritorRepository inheritorRepository)
     {
-        var data = JsonSerializer.Deserialize<UploadData>(jsonContent, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
+        _assetsRepository = assetsRepository;
+        _inheritorRepository = inheritorRepository;
+    }
 
-        if (data == null) throw new InvalidDataException("Invalid JSON format in the uploaded file.");
-
-        foreach (Asset asset in data.Assets)
+    public void UpdateRepositoriesFromJson(string jsonContent)
+    {
+        if (string.IsNullOrWhiteSpace(jsonContent))
         {
-            AssetsRepository.AddAsset(asset);
+            throw new InvalidDataException("Empty JSON content.");
         }
 
-        foreach (Inheritor inheritor in data.Inheritors)
+        try
         {
-            InheritorRepository.AddInheritor(inheritor);
+            var data = JsonSerializer.Deserialize<UploadData>(jsonContent, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (data == null || (data.Assets.Count == 0 && data.Inheritors.Count == 0))
+            {
+                throw new InvalidDataException("Invalid JSON format in the uploaded file.");
+            }
+
+            foreach (Asset asset in data.Assets)
+            {
+                _assetsRepository.AddAsset(asset);
+            }
+
+            foreach (Inheritor inheritor in data.Inheritors)
+            {
+                _inheritorRepository.AddInheritor(inheritor);
+            }
+        }
+        catch (JsonException)
+        {
+            throw new InvalidDataException("Invalid JSON format in the uploaded file.");
         }
     }
 
+
+
+
     private class UploadData
     {
-        public List<Asset> Assets {get; set;} = new();
-        public List<Inheritor> Inheritors {get; set;} = new();
+        public List<Asset> Assets { get; set; } = new();
+        public List<Inheritor> Inheritors { get; set; } = new();
     }
 }

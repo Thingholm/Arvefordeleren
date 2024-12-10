@@ -1,3 +1,5 @@
+using ArvefordelerenWebApp.Models;
+using ArvefordelerenWebApp.Services;
 using ArvefordelerenWebApp.Src;
 using Blazorise;
 using Blazorise.Bootstrap5;
@@ -9,6 +11,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddScoped<IAssetsRepository, InMemoryAssetsRepository>();
+builder.Services.AddScoped<IInheritorRepository, InMemoryInheritorRepository>();
+builder.Services.AddScoped<RepositoryUpdateService>();
+builder.Services.AddScoped<PdfService>();
+
 builder.Services
     .AddBlazorise(options =>
     {
@@ -16,6 +23,7 @@ builder.Services
     } )
     .AddBootstrap5Providers()
     .AddFontAwesomeIcons();
+
 
 var app = builder.Build();
 

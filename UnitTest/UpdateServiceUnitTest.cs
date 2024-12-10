@@ -1,95 +1,66 @@
-﻿using System;
-using System.IO;
-using System.Text.Json;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ArvefordelerenWebApp.Models;
+﻿using ArvefordelerenWebApp.Models;
 using ArvefordelerenWebApp.Services;
-using System.Collections.Generic;
 
-namespace UnitTest
+namespace UpdateServiceUnitTest;
+
+[TestClass]
+public class RepositoryUpdateServiceTests
 {
+    private InMemoryAssetsRepository _assetsRepository;
+    private InMemoryInheritorRepository _inheritorRepository;
+    private RepositoryUpdateService _repositoryUpdateService;
 
-    // Fiktiv implementering af repositoryerne
-    public class InMemoryAssetsRepository : IAssetsRepository
+    [TestInitialize]
+    public void SetUp()
     {
-        public List<Asset> Assets { get; } = new List<Asset>();
-
-        public void AddAsset(Asset asset)
-        {
-            Assets.Add(asset);
-        }
+        _assetsRepository = new InMemoryAssetsRepository();
+        _inheritorRepository = new InMemoryInheritorRepository();
+        _repositoryUpdateService = new RepositoryUpdateService(_assetsRepository, _inheritorRepository);
     }
 
-    public class InMemoryInheritorRepository : IInheritorRepository
+    [TestMethod]
+    public void UpdateRepositoriesFromJson_ValidJson_UpdatesRepositories()
     {
-        public List<Inheritor> Inheritors { get; } = new List<Inheritor>();
-
-        public void AddInheritor(Inheritor inheritor)
+        // Arrange
+        var jsonContent = @"
         {
-            Inheritors.Add(inheritor);
-        }
+            ""Assets"": [
+                { ""Id"": 1, ""Name"": ""Asset 1"", ""Value"": 1000 },
+                { ""Id"": 2, ""Name"": ""Asset 2"", ""Value"": 2000 }
+            ],
+            ""Inheritors"": [
+                { ""Id"": 1, ""Name"": ""Inheritor 1"" },
+                { ""Id"": 2, ""Name"": ""Inheritor 2"" }
+            ]
+        }";
+
+        // Act
+        _repositoryUpdateService.UpdateRepositoriesFromJson(jsonContent);
+
+        // Assert
+        Assert.AreEqual(2, _assetsRepository.Assets.Count);
+        Assert.AreEqual(2, _inheritorRepository.Inheritors.Count);
     }
 
-    [TestClass]
-    public class RepositoryUpdateServiceTests
+    [TestMethod]
+    [ExpectedException(typeof(InvalidDataException))]
+    public void UpdateRepositoriesFromJson_InvalidJson_ThrowsInvalidDataException()
     {
-        // Repositories med in-memory implementering
-        private InMemoryAssetsRepository _assetsRepository;
-        private InMemoryInheritorRepository _inheritorRepository;
+        // Arrange
+        var invalidJsonContent = "{ invalid json }";
 
-        [TestInitialize]
-        public void SetUp()
-        {
-            // Initialize the in-memory repositories
-            _assetsRepository = new InMemoryAssetsRepository();
-            _inheritorRepository = new InMemoryInheritorRepository();
-        }
-
-        [TestMethod]
-        public void UpdateRepositoriesFromJson_ValidJson_UpdatesRepositories()
-        {
-            // Arrange: Create a valid JSON string for testing
-            var jsonContent = @"
-            {
-                ""Assets"": [
-                    { ""Id"": 1, ""Name"": ""Asset 1"", ""Value"": 1000 },
-                    { ""Id"": 2, ""Name"": ""Asset 2"", ""Value"": 2000 }
-                ],
-                ""Inheritors"": [
-                    { ""Id"": 1, ""Name"": ""Inheritor 1"" },
-                    { ""Id"": 2, ""Name"": ""Inheritor 2"" }
-                ]
-            }";
-
-            // Act: Call the method to update repositories from the JSON
-            RepositoryUpdateService.UpdateRepositoriesFromJson(jsonContent);
-
-            // Assert: Verify that assets and inheritors were added to the in-memory repositories
-            Assert.AreEqual(2, _assetsRepository.Assets.Count);  // Verify 2 assets were added
-            Assert.AreEqual(2, _inheritorRepository.Inheritors.Count);  // Verify 2 inheritors were added
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidDataException))]
-        public void UpdateRepositoriesFromJson_InvalidJson_ThrowsInvalidDataException()
-        {
-            // Arrange: Create invalid JSON content
-            var invalidJsonContent = "{ invalid json }";
-
-            // Act: Verify that an InvalidDataException is thrown for invalid JSON
-            RepositoryUpdateService.UpdateRepositoriesFromJson(invalidJsonContent);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidDataException))]
-        public void UpdateRepositoriesFromJson_EmptyJson_ThrowsInvalidDataException()
-        {
-            // Arrange: Create empty JSON content
-            var emptyJsonContent = "{}";
-
-            // Act: Verify that an InvalidDataException is thrown for empty JSON
-            RepositoryUpdateService.UpdateRepositoriesFromJson(emptyJsonContent);
-        }
+        // Act
+        _repositoryUpdateService.UpdateRepositoriesFromJson(invalidJsonContent);
     }
 
+    [TestMethod]
+    [ExpectedException(typeof(InvalidDataException))]
+    public void UpdateRepositoriesFromJson_EmptyJson_ThrowsInvalidDataException()
+    {
+        // Arrange
+        var emptyJsonContent = "{}";
+
+        // Act
+        _repositoryUpdateService.UpdateRepositoriesFromJson(emptyJsonContent);
+    }
 }

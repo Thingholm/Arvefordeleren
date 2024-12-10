@@ -1,5 +1,10 @@
 ﻿@rendermode InteractiveServer
 @inject IJSRuntime JSRuntime
+@inject RepositoryUpdateService RepositoryUpdateService
+@inject IAssetsRepository AssetsRepository
+@inject IInheritorRepository InheritorRepository
+@inject PdfService PdfService
+
 
 <Bar Breakpoint="Breakpoint.Desktop">
     <BarBrand>
@@ -42,6 +47,7 @@
             Assets = AssetsRepository.GetAssets(),
             Inheritors = InheritorRepository.GetInheritors()
         }, new JsonSerializerOptions { WriteIndented = true });
+
         var pdfBytes = PdfService.GeneratePdfFromJson(jsonContent);
 
         await using MemoryStream stream = new MemoryStream(pdfBytes);
@@ -68,6 +74,7 @@
 
         try
         {
+            // Brug den injicerede RepositoryUpdateService
             RepositoryUpdateService.UpdateRepositoriesFromJson(jsonContent);
         }
         catch (Exception ex)
