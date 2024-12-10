@@ -52,6 +52,7 @@ public static class InheritorRepository
         existingInheritor.Name = inheritor.Name;
         existingInheritor.InheritorType = inheritor.InheritorType;
         existingInheritor.InheritsFreeInheritance = inheritor.InheritsFreeInheritance;
+        existingInheritor.FreeInheritancePercentage = inheritor.FreeInheritancePercentage;
     }
 
     public static void DeleteInheritor(Inheritor inheritor)
