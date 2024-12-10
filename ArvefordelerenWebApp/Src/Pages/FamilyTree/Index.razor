@@ -11,6 +11,7 @@
                 <TableHeaderCell>Navn</TableHeaderCell>
                 <TableHeaderCell>Arveklasse</TableHeaderCell>
                 <TableHeaderCell>Del af friarv</TableHeaderCell>
+                <TableHeaderCell>Procentdel af friarv</TableHeaderCell>
                 <TableHeaderCell>Udtagelsesret til aktiver</TableHeaderCell>
                 <TableHeaderCell></TableHeaderCell>
             </TableRow>
@@ -23,6 +24,7 @@
                     <TableRowCell class="align-middle">@inheritor.Name</TableRowCell>
                     <TableRowCell class="align-middle">@((int)inheritor.InheritorType)</TableRowCell>
                     <TableRowCell class="align-middle"><Icon Name="IconName.Check" hidden=@(!inheritor.InheritsFreeInheritance)/></TableRowCell>
+                    <TableRowCell class="align-middle">@((decimal)(inheritor.FreeInheritancePercentage ?? 0))%</TableRowCell>
                     <TableRowCell class="align-middle">
                         @for (int i = 0; i < AssetsRepository.GetAssetsByRightOfWithdrawal(inheritor).Count(); i++)
                         {
