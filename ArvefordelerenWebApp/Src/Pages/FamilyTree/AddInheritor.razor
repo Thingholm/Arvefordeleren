@@ -37,7 +37,22 @@
 
             <Field>
                 <FieldBody>
-                    <Check TValue="bool" @bind-Checked="newInheritor.InheritsFreeInheritance">Del i friarv</Check>
+                    <Check TValue="bool" @bind-Checked="newInheritor.InheritsFreeInheritance">
+                        Del i friarv
+                    </Check>
+                    @if (newInheritor.InheritsFreeInheritance)
+                    {
+                        <NumericEdit TValue="decimal?" @bind-Value="newInheritor.FreeInheritancePercentage" Placeholder="Indtast procent">
+                            <Feedback>
+                                <ValidationError>Indtast venligst en gyldig procentdel</ValidationError>
+                            </Feedback>
+                        </NumericEdit>
+                        
+                        @if (!string.IsNullOrEmpty(validationErrorMessage))
+                        {
+                            <div class="text-danger">@validationErrorMessage</div>
+                        }
+                    }
                 </FieldBody>
             </Field>
             
@@ -73,6 +88,7 @@
 
 @code 
 {
+    private string? validationErrorMessage;
     [Parameter]
     public List<Inheritor> Inheritors { get; set; } = new List<Inheritor>();
     [Parameter]
@@ -88,11 +104,14 @@
 
     private Modal modalRef = new Modal();
     private Validations validationsRef { get; set; } = new Validations();
-
-   
-
     private async Task addInheritor()
     {
+        validationErrorMessage = ValidateInheritancePercentage();
+        if (validationErrorMessage != null)
+        {
+            return;
+        }
+        
         if (await validationsRef.ValidateAll())
         {
             InheritorRepository.AddInheritor(newInheritor);
@@ -102,7 +121,7 @@
             newInheritor = new Inheritor();
 
             await validationsRef.ClearAll();
-
+            validationErrorMessage = null;
             modalRef?.Hide();
         }
     }
@@ -121,5 +140,19 @@
         }
 
         asset.RightOfWithdrawal = inheritor;
+    }
+
+    private string? ValidateInheritancePercentage()
+    {
+        decimal totalPercentage = Inheritors
+            .Where(i => i.InheritsFreeInheritance && i.FreeInheritancePercentage.HasValue)
+            .Sum(i => i.FreeInheritancePercentage.GetValueOrDefault());
+
+        if (newInheritor.FreeInheritancePercentage.HasValue)
+        {
+            totalPercentage += newInheritor.FreeInheritancePercentage.Value;
+        }
+
+        return totalPercentage > 100 ? $"Den samlede procentdel må ikke overstige 100%, lige nu er {totalPercentage}% brugt" : null;
     }
 }
