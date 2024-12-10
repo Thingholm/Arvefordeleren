@@ -22,12 +22,13 @@
 @code
 {
     private List<Inheritor> inheritors = InheritorRepository.GetInheritors();
+    private List<Inheritor> removedInheritors = new List<Inheritor>()
+    {
+        new Inheritor{Id = 2, Name = "Gustav", InheritorType = InheritorType.Type1}
+    };
     private int numberOfFreeInheritors = InheritorRepository.GetInheritors().Sum(i => i.InheritsFreeInheritance ? 1 : 0);
 
     private int fullInheritance = 100;
-    List<Inheritor> inheritorsWithInheritanceClassOne = InheritorRepository.GetInheritors().Where(i => i.InheritorType == InheritorType.Type1).ToList();
-    List<Inheritor> inheritorsWithInheritanceClassTwo = InheritorRepository.GetInheritors().Where(i => i.InheritorType == InheritorType.Type2).ToList();
-    List<Inheritor> inheritorsWithInheritanceClassThree = InheritorRepository.GetInheritors().Where(i => i.InheritorType == InheritorType.Type3).ToList();
 
     private Chart<double> pieChart = new Chart<double>();
     List<string> backgroundColors = new List<string>
@@ -58,31 +59,22 @@
 
     private double calculateForcedInheritance(Inheritor inheritor) 
     {
-        double forcedInheritance = fullInheritance / 4.0;
+        double forcedInheritance = fullInheritance / 4;
+        List<Inheritor> inheritorsWithInheritanceClassOne = inheritors.Where(i => i.InheritorType == InheritorType.Type1 && !removedInheritors.Any(ri => ri.Id == i.Id)).ToList();
+        List<Inheritor> inheritorsWithInheritanceClassTwo = inheritors.Where(i => i.InheritorType == InheritorType.Type2 && !removedInheritors.Any(ri => ri.Id == i.Id)).ToList();
+        List<Inheritor> inheritorsWithInheritanceClassThree = inheritors.Where(i => i.InheritorType == InheritorType.Type3 && !removedInheritors.Any(ri => ri.Id == i.Id)).ToList();
 
         if(inheritorsWithInheritanceClassOne.Contains(inheritor)) 
         {
-
-            double partOfForcedInheritance = forcedInheritance / inheritorsWithInheritanceClassOne.Count;
-
-            return partOfForcedInheritance;
-
+            return forcedInheritance / inheritorsWithInheritanceClassOne.Count;
         } 
         else if (inheritorsWithInheritanceClassOne.Count == 0 && inheritorsWithInheritanceClassTwo.Contains(inheritor)) 
         {
-
-            double partOfForcedInheritance = forcedInheritance / inheritorsWithInheritanceClassTwo.Count;
-
-            return partOfForcedInheritance;
-
+            return forcedInheritance / inheritorsWithInheritanceClassTwo.Count;
         } 
         else if (inheritorsWithInheritanceClassOne.Count == 0 && inheritorsWithInheritanceClassTwo.Count == 0) 
         {
-
-            double partOfForcedInheritance = forcedInheritance / inheritorsWithInheritanceClassThree.Count;
-
-            return partOfForcedInheritance;
-            
+            return forcedInheritance / inheritorsWithInheritanceClassThree.Count;
         } 
         else 
         {
@@ -109,13 +101,17 @@
         return new PieChartDataset<double>
         {
             Label = "Fordeling af arv",
-            Data = inheritors.Select(i => calculateForcedInheritance(i) + calculateFreeInheritance(i)).ToList(),
+            Data = inheritors.Where(i => !removedInheritors.Any(ri => ri.Id == i.Id))
+                .Select(i => calculateForcedInheritance(i) + calculateFreeInheritance(i))
+                .ToList(),
             BackgroundColor = backgroundColors
         };
     }
 
     private List<string> getPieChartLabels()
     {
-        return inheritors.Select(i => i.Name ?? "").ToList();
+        return inheritors.Where(i => !removedInheritors.Any(ri => ri.Id == i.Id))
+            .Select(i => i.Name ?? "")
+            .ToList();
     }
 }
