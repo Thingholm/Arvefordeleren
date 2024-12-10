@@ -8,8 +8,14 @@
         @foreach(Inheritor inheritor in inheritors)
         {
             <li>
-                @inheritor.Name: 
-                @(calculateForcedInheritance(inheritor) + calculateFreeInheritance(inheritor))
+                <Check 
+                    TValue="bool" 
+                    Checked="@(removedInheritors.Any(i => i.Id == inheritor.Id))"
+                    CheckedChanged="() => handleInheritorCheck(inheritor)"
+                >
+                    @inheritor.Name: 
+                    @(calculateForcedInheritance(inheritor) + calculateFreeInheritance(inheritor))
+                </Check>
             </li>
         }
     </ul>
@@ -55,6 +61,21 @@
         await pieChart.Clear();
 
         await pieChart.AddLabelsDatasetsAndUpdate(getPieChartLabels(), getPieChartDataset());
+    }
+
+    private async Task handleInheritorCheck(Inheritor inheritor)
+    {
+        Inheritor? removedInheritor = removedInheritors.Find(ri => ri.Id == inheritor.Id);
+
+        if (removedInheritor != null)
+        {
+            removedInheritors.Remove(removedInheritor);
+            await handleRedraw();
+            return;
+        }
+
+        removedInheritors.Add(inheritor);
+        await handleRedraw();
     }
 
     private double calculateForcedInheritance(Inheritor inheritor) 
