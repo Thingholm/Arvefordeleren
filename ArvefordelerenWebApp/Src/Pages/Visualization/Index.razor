@@ -29,7 +29,7 @@
     List<Inheritor> inheritorsWithInheritanceClassTwo = InheritorRepository.GetInheritors().Where(i => i.InheritorType == InheritorType.Type2).ToList();
     List<Inheritor> inheritorsWithInheritanceClassThree = InheritorRepository.GetInheritors().Where(i => i.InheritorType == InheritorType.Type3).ToList();
 
-    private Chart<double> pieChart;
+    private Chart<double> pieChart = new Chart<double>();
     List<string> backgroundColors = new List<string>
     {
         ChartColor.FromRgba(255, 70, 70, 0.8f),
