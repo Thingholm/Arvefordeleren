@@ -1,0 +1,121 @@
+@page "/arvfordeling"
+@rendermode InteractiveServer
+
+<PageTitle>Fordeling af arv</PageTitle>
+
+<div>
+    <ul>
+        @foreach(Inheritor inheritor in inheritors)
+        {
+            <li>
+                @inheritor.Name: 
+                @(calculateForcedInheritance(inheritor) + calculateFreeInheritance(inheritor))
+            </li>
+        }
+    </ul>
+
+    <div class="col-6">
+    <Chart Type="ChartType.Pie" @ref=pieChart TItem="double"/>
+    </div>
+</div>
+
+@code
+{
+    private List<Inheritor> inheritors = InheritorRepository.GetInheritors();
+    private int numberOfFreeInheritors = InheritorRepository.GetInheritors().Sum(i => i.InheritsFreeInheritance ? 1 : 0);
+
+    private int fullInheritance = 100;
+    List<Inheritor> inheritorsWithInheritanceClassOne = InheritorRepository.GetInheritors().Where(i => i.InheritorType == InheritorType.Type1).ToList();
+    List<Inheritor> inheritorsWithInheritanceClassTwo = InheritorRepository.GetInheritors().Where(i => i.InheritorType == InheritorType.Type2).ToList();
+    List<Inheritor> inheritorsWithInheritanceClassThree = InheritorRepository.GetInheritors().Where(i => i.InheritorType == InheritorType.Type3).ToList();
+
+    private Chart<double> pieChart;
+    List<string> backgroundColors = new List<string>
+    {
+        ChartColor.FromRgba(255, 70, 70, 0.8f),
+        ChartColor.FromRgba(70, 130, 255, 0.8f),
+        ChartColor.FromRgba(255, 220, 70, 0.8f),
+        ChartColor.FromRgba(70, 255, 135, 0.8f),
+        ChartColor.FromRgba(185, 70, 255, 0.8f),
+        ChartColor.FromRgba(255, 140, 50, 0.8f)
+    };
+    ChartOptions chartOptions = new() { AspectRatio = 1.5 };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await handleRedraw();
+        }
+    }
+
+    private async Task handleRedraw()
+    {
+        await pieChart.Clear();
+
+        await pieChart.AddLabelsDatasetsAndUpdate(getPieChartLabels(), getPieChartDataset());
+    }
+
+    private double calculateForcedInheritance(Inheritor inheritor) 
+    {
+        double forcedInheritance = fullInheritance / 4.0;
+
+        if(inheritorsWithInheritanceClassOne.Contains(inheritor)) 
+        {
+
+            double partOfForcedInheritance = forcedInheritance / inheritorsWithInheritanceClassOne.Count;
+
+            return partOfForcedInheritance;
+
+        } 
+        else if (inheritorsWithInheritanceClassOne.Count == 0 && inheritorsWithInheritanceClassTwo.Contains(inheritor)) 
+        {
+
+            double partOfForcedInheritance = forcedInheritance / inheritorsWithInheritanceClassTwo.Count;
+
+            return partOfForcedInheritance;
+
+        } 
+        else if (inheritorsWithInheritanceClassOne.Count == 0 && inheritorsWithInheritanceClassTwo.Count == 0) 
+        {
+
+            double partOfForcedInheritance = forcedInheritance / inheritorsWithInheritanceClassThree.Count;
+
+            return partOfForcedInheritance;
+            
+        } 
+        else 
+        {
+            return 0;
+        }
+    }
+
+    private double calculateFreeInheritance(Inheritor inheritor)
+    {
+        double freeInheritance = fullInheritance * 3 / 4;
+
+        if (inheritor.InheritsFreeInheritance)
+        {
+            return freeInheritance / numberOfFreeInheritors;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    private PieChartDataset<double> getPieChartDataset()
+    {
+        return new PieChartDataset<double>
+        {
+            Label = "Fordeling af arv",
+            Data = inheritors.Select(i => calculateForcedInheritance(i) + calculateFreeInheritance(i)).ToList(),
+            BackgroundColor = backgroundColors
+        };
+    }
+
+    private List<string> getPieChartLabels()
+    {
+        return inheritors.Select(i => i.Name ?? "").ToList();
+    }
+}
