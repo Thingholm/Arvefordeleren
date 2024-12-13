@@ -188,7 +188,7 @@
     private string? ValidateInheritancePercentage()
     {
         decimal totalPercentage = Inheritors
-            .Where(i => i.InheritsFreeInheritance && i.FreeInheritancePercentage.HasValue)
+            .Where(i => i.InheritsFreeInheritance && i.FreeInheritancePercentage.HasValue && i.Id != inheritorToEdit.Id)
             .Sum(i => i.FreeInheritancePercentage.GetValueOrDefault());
 
         if (inheritorToEdit.FreeInheritancePercentage.HasValue)

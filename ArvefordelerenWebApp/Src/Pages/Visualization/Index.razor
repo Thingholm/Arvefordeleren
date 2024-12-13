@@ -4,18 +4,18 @@
 <PageTitle>Fordeling af arv</PageTitle>
 
 <div class="col-12 d-flex flex-column align-items-center">
-     <div class="col-8 d-inline-flex justify-content-around mb-4">
+    <div class="col-8 d-inline-flex justify-content-around mb-4">
         @foreach(var inheritor in inheritors.Select((value, index) => new { value, index }))
         {
-                <Check 
-                    TValue="bool" 
-                    Checked="@(!removedInheritors.Any(i => i.Id == inheritor.value.Id))"
-                    CheckedChanged="() => handleInheritorCheck(inheritor.value)"
-                >
-                    @inheritor.value.Name: 
-                    @(Math.Round((calculateForcedInheritance(inheritor.value) + calculateFreeInheritance(inheritor.value)) * 100) / 100)%
-                    <div style="display: block; height: 6px; width: 100%; border-radius: 2px; background-color: @(backgroundColors[inheritor.index].ToString())"></div>
-                </Check>
+            <Check 
+            TValue="bool" 
+            Checked="@(!removedInheritors.Any(i => i.Id == inheritor.value.Id))"
+            CheckedChanged="() => handleInheritorCheck(inheritor.value)"
+            >
+                @inheritor.value.Name: 
+                @(Math.Round((calculateForcedInheritance(inheritor.value) + calculateFreeInheritance(inheritor.value)) * 100) / 100)%
+                <div style="display: block; height: 6px; width: 100%; border-radius: 2px; background-color: @(backgroundColors[inheritor.index].ToString())"></div>
+            </Check>
         }
     </div>
     <div class="col-6">
@@ -111,16 +111,16 @@
 
     private double calculateFreeInheritance(Inheritor inheritor)
     {
-        int numberOfFreeInheritors = InheritorRepository.GetInheritors().Where(i => !removedInheritors.Any(ri => ri.Id == i.Id)).Sum(i => i.InheritsFreeInheritance ? 1 : 0);
-        
         double freeInheritance = fullInheritance * 3 / 4;
 
-        if (inheritor.InheritsFreeInheritance && !removedInheritors.Any(ri => ri.Id == inheritor.Id))
+        if (inheritor.InheritsFreeInheritance) 
         {
-            return freeInheritance / numberOfFreeInheritors;
+            return (double)((inheritor.FreeInheritancePercentage ?? 0 ) / 100) * freeInheritance;
         }
-
-        return 0;
+        else 
+        {
+            return 0;
+        }
     }
 
     private PieChartDataset<double> getPieChartDataset()
