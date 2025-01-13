@@ -34,22 +34,7 @@
     </BarMenu>
 </Bar>
 
-<Toaster Placement="ToasterPlacement.TopEnd" PlacementStrategy="ToasterPlacementStrategy.Fixed">
-    <Toast @bind-Visible="@isToastVisible" Autohide="true" AutohideDelay="10000" Class="@toastClass">
-        <ToastHeader>
-            <Strong>@toastHeader</Strong>
-        </ToastHeader>
-        <ToastBody>
-            @toastMessage
-        </ToastBody>
-    </Toast>
-</Toaster>
-
 @code {
-    private bool isToastVisible = false;
-    private string? toastMessage;
-    private string? toastHeader;
-    private string? toastClass = "bg-danger";
     private async Task DownloadPageAsPdf()
     {
         var jsonContent = JsonSerializer.Serialize(new
@@ -69,15 +54,6 @@
         var file = e.File;
         if (file == null) return;
 
-        if (!file.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
-        {
-            toastMessage = "Upload venligst kun filer i PDF-format";
-            toastHeader = "Fejl";
-            toastClass = "bg-danger";
-            isToastVisible = true;
-            return;
-        }
-
         using MemoryStream stream = new MemoryStream();
         await file.OpenReadStream().CopyToAsync(stream);
 
@@ -86,27 +62,17 @@
 
         if (string.IsNullOrWhiteSpace(jsonContent))
         {
-            toastMessage = "Kunne ikke indlæse nogle gyldige data fra PDF";
-            toastHeader = "Fejl";
-            toastClass = "bg-danger";
-            isToastVisible = true;
+            Console.WriteLine("Noget gik galt");
             return;
         }
 
         try
         {
             RepositoryUpdateService.UpdateRepositoriesFromJson(jsonContent);
-            toastMessage = "Data fra PDF indsat i tabeller";
-            toastHeader = "Succes";
-            toastClass = "bg-success";
-            isToastVisible = true;
         }
         catch
         {
-            toastMessage = "Kunne ikke indlæse nogle gyldige data fra PDF";
-            toastHeader = "Fejl";
-            toastClass = "bg-danger";
-            isToastVisible = true;
+            return;
         }
     }
 }    
