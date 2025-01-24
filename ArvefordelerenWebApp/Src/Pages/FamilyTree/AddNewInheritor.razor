@@ -1,0 +1,29 @@
+@inject NavigationManager navigationManager
+
+
+@page "/anheritors"
+
+<h3>Tilføj arving</h3>
+
+<EditForm Model="inheritor" FormName="formInheritor" OnValidSubmit="Submit">
+    <div>
+        <label>Navn</label>
+    </div>
+    <div>
+        <InputText @bind-Value="inheritor.Name"></InputText>
+    </div>
+    <br>
+    <button class="btn btn-primary" style="height: 40px; width: 100px;" type="submit">Tilføj</button>
+</EditForm>
+
+
+@code {
+    [SupplyParameterFromForm]
+     public Inheritor inheritor { get; set; } = new Inheritor() {FreeInheritancePercentage = 0, InheritorType = InheritorType.TypeEmpty, InheritsFreeInheritance = false };
+    
+    public void Submit() 
+    {
+        InheritorRepository.AddInheritor(inheritor);
+        navigationManager.NavigateTo("/inheritors");
+    }
+}

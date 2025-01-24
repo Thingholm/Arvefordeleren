@@ -1,0 +1,33 @@
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+@page "/inheritors"
+
+<div>
+    @foreach(var item in inheritors) 
+    {
+        <div>
+            @item.Name
+        </div>
+        
+    }
+</div>
+
+<button class="btn btn-primary" style="height: 30px; width: 100px;" @onclick="navigate">Tilføj arving</button>
+
+
+
+@code {
+    
+    private List<Inheritor> inheritors = new List<Inheritor>();
+    protected override void OnParametersSet() 
+    {
+        inheritors = InheritorRepository.GetInheritors();
+    }
+     
+
+    public void navigate() 
+    {
+        navigationManager.NavigateTo("/addInheritors");
+    }
+}
