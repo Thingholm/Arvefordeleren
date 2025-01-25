@@ -1,0 +1,12 @@
+﻿@rendermode InteractiveServer
+
+<div class="total-assets">
+    <h3>Total værdi af aktiver: @TotalValue.ToString("N2")</h3>
+</div>
+
+@code {
+    [Parameter]
+    public List<Asset> Assets { get; set; } = new();
+
+    private double TotalValue => Assets.Sum(asset => asset.Value ?? 0);
+}
