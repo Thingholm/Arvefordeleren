@@ -44,63 +44,9 @@
     private string? toastMessage;
     private string? toastHeader;
     private string? toastClass = "bg-danger";
-    private async Task DownloadPageAsPdf()
-    {
-        var jsonContent = JsonSerializer.Serialize(new
-        {
-            Assets = AssetsRepository.GetAssets(),
-            Inheritors = InheritorRepository.GetInheritors()
-        }, new JsonSerializerOptions { WriteIndented = true });
-        var pdfBytes = PdfService.GeneratePdfFromJson(jsonContent);
+ 
 
-        await using MemoryStream stream = new MemoryStream(pdfBytes);
-        string fileName = "Arvefordeleren.pdf";
-        await JSRuntime.InvokeVoidAsync("downloadFile", fileName, "application/pdf", Convert.ToBase64String(pdfBytes));
-    }
 
-    private async Task HandleFileUpload(InputFileChangeEventArgs e)
-    {
-        var file = e.File;
-        if (file == null) return;
-
-        if (!file.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
-        {
-            toastMessage = "Upload venligst kun filer i PDF-format";
-            toastHeader = "Fejl";
-            toastClass = "bg-danger";
-            isToastVisible = true;
-            return;
-        }
-
-        using MemoryStream stream = new MemoryStream();
-        await file.OpenReadStream().CopyToAsync(stream);
-
-        var pdfBytes = stream.ToArray();
-        var jsonContent = PdfParsingService.ExtractJsonFromPdf(pdfBytes);
-
-        if (string.IsNullOrWhiteSpace(jsonContent))
-        {
-            toastMessage = "Kunne ikke indlæse nogle gyldige data fra PDF";
-            toastHeader = "Fejl";
-            toastClass = "bg-danger";
-            isToastVisible = true;
-            return;
-        }
-
-        try
-        {
-            RepositoryUpdateService.UpdateRepositoriesFromJson(jsonContent);
-            toastMessage = "Data fra PDF indsat i tabeller";
-            toastHeader = "Succes";
-            toastClass = "bg-success";
-            isToastVisible = true;
-        }
-        catch
-        {
-            toastMessage = "Kunne ikke indlæse nogle gyldige data fra PDF";
-            toastHeader = "Fejl";
-            toastClass = "bg-danger";
-            isToastVisible = true;
-        }
-    }
-}    
+   
+}
+  
